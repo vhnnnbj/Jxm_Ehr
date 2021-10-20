@@ -13,5 +13,12 @@
     "laravel/framework": ">=6.20",
     "ext-json": "*",
     "guzzlehttp/guzzle": "~6.0"
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Jxm\\Ehr\\EhrServiceProvider"
+      ]
+    }
   }
 }
