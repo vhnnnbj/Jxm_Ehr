@@ -1,8 +1,6 @@
 <?php
 
 return [
-
-
     /**
      * Ehr URL
      */

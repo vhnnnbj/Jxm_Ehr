@@ -1,15 +1,17 @@
 {
-    "name": "jxm/ehr",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "csf",
-            "email": "chenshifang@jiuxunmu.com"
-        }
-    ],
-    "require": {
-        "php": ">=7.4",
-        "hprose/hprose": "^2.0",
-        "laravel/framework": ">=6.20"
+  "name": "jxm/ehr",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "csf",
+      "email": "chenshifang@jiuxunmu.com"
     }
+  ],
+  "require": {
+    "php": "^7.4|^8.0",
+    "hprose/hprose": "^2.0",
+    "laravel/framework": ">=6.20",
+    "ext-json": "*",
+    "guzzlehttp/guzzle": "~6.0"
+  }
 }
