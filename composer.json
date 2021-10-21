@@ -14,6 +14,11 @@
     "ext-json": "*",
     "guzzlehttp/guzzle": "~6.0"
   },
+  "autoload": {
+    "psr-4": {
+      "Jxm\\Ehr\\": "src/"
+    }
+  },
   "extra": {
     "laravel": {
       "providers": [
