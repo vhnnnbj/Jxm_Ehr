@@ -16,6 +16,7 @@ class CreateJxmEhrTokenInfosTable extends Migration
         Schema::create('jxm_ehr_token_infos', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->morphs('user', 'users');
+            $table->string('token_type');
             $table->string('access_token');
             $table->string('refresh_token');
             $table->timestamp('expires_at')->nullable();
