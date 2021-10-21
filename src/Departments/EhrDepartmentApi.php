@@ -6,7 +6,7 @@ namespace Jxm\Ehr\Departments;
 
 class EhrDepartmentApi
 {
-    public function getTrees($department_id = null)
+    public static function getTrees($department_id = null)
     {
 
 

@@ -126,21 +126,4 @@ class EhrAuthApi
 //        return Tool::formatOutput($request, $result, null, ErrorCode::ERR_OK, '登录成功');
 ////        return Tool::commonDataInput(ErrorCode::ERR_OK, $result, 3, '登录成功');
     }
-
-    public static function getInfos(JxmEhrTokenInfos $token)
-    {
-        $response = (new Client())->get(config('ehr.api') . 'auth/info', [
-            'headers' => [
-                'X-Requested-With' => 'XMLHttpRequest',
-                'Authorization' => $token->token_type . ' ' . $token->access_token,
-            ],
-        ]);
-        $result = json_decode($response->getBody()->getContents(), true);
-        return $result;
-    }
-
-    public static function logout()
-    {
-
-    }
 }
