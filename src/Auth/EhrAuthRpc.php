@@ -18,8 +18,13 @@ class EhrAuthRpc
     public $resultInfos = [];
     public $editorInfos = [];
 
+    const State_Normal = 0;         //正常
+    const State_Leave = 10;          //离职
+    const State_Black = 20;          //黑名单
+    const State_Exception = 30;      //异常
+
     public function addInfos(&$error, $account, $password, $name, $identify, $sex, $phone, $entry_time,
-                             $address = null, $img = null, $describe = null, $editor_id = null, $details = null)
+                             $state, $address = null, $img = null, $describe = null, $details = null)
     {
         if (sizeof(Arr::where($this->allInfos, function ($item) use ($identify) {
                 return $item['identify'] == $identify;
@@ -35,10 +40,10 @@ class EhrAuthRpc
             'sex' => $sex,
             'phone' => $phone,
             'entry_time' => $entry_time,
+            'state' => $state,
             'address' => $address,
             'img' => $img,
             'describe' => $describe,
-            'editor_id' => $editor_id,
             'details' => $details,
         ];
         return true;
@@ -89,6 +94,13 @@ class EhrAuthRpc
 
     public function updateEditor()
     {
-
+        $client = new Client(config('ehr.service') . 'archive/info', false);
+        $res = $client->updateEditor(json_encode($this->allInfos),
+            new InvokeSettings(['mode' => ResultMode::Normal]));
+        $this->resultInfos = [
+            'success' => $res['success'],
+            'fail' => $res['fail'],
+        ];
+        return $this->resultInfos;
     }
 }
