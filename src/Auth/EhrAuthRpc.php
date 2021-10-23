@@ -4,7 +4,7 @@
 namespace Jxm\Ehr\Auth;
 
 
-use App\Models\User;
+use Carbon\Carbon;
 use Hprose\Http\Client;
 use Hprose\InvokeSettings;
 use Hprose\ResultMode;
@@ -13,21 +13,22 @@ use Illuminate\Support\Facades\Log;
 
 class EhrAuthRpc
 {
-    public $client;
-    public $allInfos = [];
-    public $resultInfos = [];
-    public $editorInfos = [];
+    private $client;
+    private $allInfos = [];
+    private $resultInfos = [];
+    private $editorInfos = [];
 
     const State_Normal = 0;         //正常
     const State_Leave = 10;          //离职
     const State_Black = 20;          //黑名单
     const State_Exception = 30;      //异常
 
-    public function addInfos(&$error, $account, $password, $name, $identify, $sex, $phone, $entry_time,
-                             $state, $address = null, $img = null, $describe = null, $details = null)
+    public function addInfos(&$error, $account, $password, $name, $identity, $sex, $phone, $entry_time,
+                             $state, $created_at, $updated_at, $email = null, $address = null, $img = null,
+                             $describe = null, $details = null)
     {
-        if (sizeof(Arr::where($this->allInfos, function ($item) use ($identify) {
-                return $item['identify'] == $identify;
+        if (sizeof(Arr::where($this->allInfos, function ($item) use ($identity) {
+                return $item['identity'] == $identity;
             })) > 0) {
             $error = makeErrorMsg('该身份证号已存在，不要重复添加！', 5);
             return false;
@@ -36,46 +37,50 @@ class EhrAuthRpc
             'account' => $account,
             'password' => $password,
             'name' => $name,
-            'identify' => $identify,
+            'identity' => $identity,
             'sex' => $sex,
             'phone' => $phone,
             'entry_time' => $entry_time,
             'state' => $state,
+            'email' => $email,
             'address' => $address,
             'img' => $img,
             'describe' => $describe,
             'details' => $details,
+            'created_at' => Carbon::parse($created_at)->format('Y-m-d H:i:s'),
+            'updated_at' => Carbon::parse($updated_at)->format('Y-m-d H:i:s'),
         ];
         return true;
     }
 
     public function sendInfo()
     {
+        Log::info('sendInfos', $this->allInfos);
+        if (sizeof($this->allInfos) == 0) {
+            return null;
+        }
         $client = new Client(config('ehr.service') . 'archive/info', false);
-        $res = $client->import(json_encode($this->allInfos), new InvokeSettings(['mode' => ResultMode::Normal]));
-        $this->resultInfos = [
-            'success' => $res['success'],
-            'fail' => $res['fail'],
-        ];
-        return $this->resultInfos;
-//        Log::info('result:' . $send, $res);
-//        foreach ($res['success'] as $item) {
-//
-//            UserInfo::where('id', $item['userinfo_id'])->update([
-//                'sc_id' => $item['sc_id'],
-//            ]);
-//        }
-//        foreach ($res['fail'] as $item) {
-//            if ($item['type'] == 'exists') {
-//                UserInfo::where('id', $item['userinfo_id'])->update([
-//                    'sc_id' => $item['sc_id'],
-//                ]);
+        $client->setTimeout(60000);
+//        Log::info('test:' . $client->test('is a test mesg', new InvokeSettings(['mode' => ResultMode::Normal])));
+        $this->resultInfos = $client->import(json_encode($this->allInfos),
+            new InvokeSettings(['mode' => ResultMode::Normal]));
+        Log::info('import result', $this->resultInfos);
+//        foreach ($this->allInfos as $info) {
+//            Log::info('syncOne', $info);
+//            $result = $client->syncOne(json_encode($info), new InvokeSettings(['mode' => ResultMode::Normal]));
+//            Log::info('syncOne Result', $result);
+//            if ($result['res'] == 'success') {
+//                $this->resultInfos['success'][] = $result;
+//            } else {
+//                $this->resultInfos['fail'][] = $result;
 //            }
 //        }
-//        $infos = UserInfo::with(['editor:id,sc_id'])->where('id', '!=', 1)
-//            ->get(['id', 'editor_id', 'username', 'identityNumber', 'sc_id']);
-//        $res = $client->updateEditor(json_encode($infos->toArray()), new InvokeSettings(['mode' => ResultMode::Normal]));
-//        Log::info('update result', $res);
+        return $this->resultInfos;
+    }
+
+    public function countInfos()
+    {
+        return sizeof($this->allInfos);
     }
 
     public function clearInfos()
@@ -94,13 +99,14 @@ class EhrAuthRpc
 
     public function updateEditor()
     {
+        Log::info('editorInfos', $this->editorInfos);
+        if (sizeof($this->editorInfos) == 0) {
+            return null;
+        }
         $client = new Client(config('ehr.service') . 'archive/info', false);
-        $res = $client->updateEditor(json_encode($this->allInfos),
+        $res = $client->updateEditor(json_encode($this->editorInfos),
             new InvokeSettings(['mode' => ResultMode::Normal]));
-        $this->resultInfos = [
-            'success' => $res['success'],
-            'fail' => $res['fail'],
-        ];
-        return $this->resultInfos;
+        Log::info('update result', $res);
+        return $res;
     }
 }

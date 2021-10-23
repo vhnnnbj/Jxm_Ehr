@@ -25,7 +25,7 @@ trait HasEhrInfo
 
     public function ehr_getInfo()
     {
-        if (!$this->ehr_token) {
+        if (!$this->ehr_token || now()->gt($this->ehr_token->expires_at)) {
             return null;
         }
         $result = JxmEhrAccessHelper::postApi($error, config('ehr.api') . 'auth/info',

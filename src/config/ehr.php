@@ -9,17 +9,17 @@ return [
     /**
      * RPC Service
      */
-    'service' => config('ehr.url') . 'api/service/',
+    'service' => env('EHR_URL', 'http://192.168.130.103:6688/') . 'api/service/',
 
     /**
      * API
      */
-    'api' => config('ehr.url') . 'api/v1/',
+    'api' => env('EHR_URL', 'http://192.168.130.103:6688/') . 'api/v1/',
 
     /**
      * OAUTH URL
      */
-    'oauth' => config('ehr.url') . 'oauth/',
+    'oauth' => env('EHR_URL', 'http://192.168.130.103:6688/') . 'oauth/',
 
     /**
      * CLIENT_INFO

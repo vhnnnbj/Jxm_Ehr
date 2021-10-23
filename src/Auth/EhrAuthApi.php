@@ -25,17 +25,24 @@ class EhrAuthApi
 
         $client = new Client();
         try {
+            Log::info('ehr_login:' . config('ehr.oauth') . 'token', [
+                'grant_type' => 'password',
+                'client_id' => config('ehr.client.id'),
+                'client_secret' => config('ehr.client.secret'),
+                'username' => $username,
+                'password' => $password,
+            ]);
             $response = $client->request('POST', config('ehr.oauth') . 'token', [
                 'form_params' => [
                     'grant_type' => 'password',
                     'client_id' => config('ehr.client.id'),
-                    'client_secret' => config('ehr.client.key'),
+                    'client_secret' => config('ehr.client.secret'),
                     'username' => $username,
                     'password' => $password,
                     'scope' => '*',
                 ]]);
-
             $login_result = json_decode($response->getBody()->getContents(), true);
+            Log::info('login_result', $login_result);
 
             $token = new JxmEhrTokenInfos([
                 'token_type' => $login_result['token_type'],
@@ -43,7 +50,11 @@ class EhrAuthApi
                 'refresh_token' => $login_result['refresh_token'],
                 'expires_at' => now()->addSeconds($login_result['expires_in']),
             ]);
-            $response = (new Client())->get(config('ehr.api') . 'auth/info', [
+            Log::info('ehr_info:' . config('ehr.api') . 'auth/info', [
+                'X-Requested-With' => 'XMLHttpRequest',
+                'Authorization' => $login_result['token_type'] . ' ' . $login_result['access_token'],
+            ]);
+            $response = (new Client())->post(config('ehr.api') . 'auth/info', [
                 'headers' => [
                     'X-Requested-With' => 'XMLHttpRequest',
                     'Authorization' => $login_result['token_type'] . ' ' . $login_result['access_token'],
