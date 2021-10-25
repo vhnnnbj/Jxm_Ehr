@@ -54,23 +54,4 @@ class EhrAuthApi
             abort(401, '登录失败，账号名或者密码错误！');
         }
     }
-
-    public static function getInfos(JxmEhrTokenInfos $token)
-    {
-        $response = JxmEhrAccessHelper::postApi($error, config('ehr.api') . 'auth/info',
-            $token);
-//        $response = (new Client())->get(config('ehr.api') . 'auth/info', [
-//            'headers' => [
-//                'X-Requested-With' => 'XMLHttpRequest',
-//                'Authorization' => $token->token_type . ' ' . $token->access_token,
-//            ],
-//        ]);
-        $result = json_decode($response->getBody()->getContents(), true);
-        return $result;
-    }
-
-    public static function logout()
-    {
-
-    }
 }

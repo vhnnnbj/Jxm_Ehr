@@ -20,7 +20,7 @@ trait HasEhrInfo
             return;
         }
         $result = JxmEhrAccessHelper::postApi($error, config('ehr.api') . 'auth/logout',
-            $this->ehr_token->token_type, $this->ehr_token->access_token);
+            $this->ehr_token);
     }
 
     public function ehr_getInfo()
@@ -29,7 +29,7 @@ trait HasEhrInfo
             return null;
         }
         $result = JxmEhrAccessHelper::postApi($error, config('ehr.api') . 'auth/info',
-            $this->ehr_token->token_type, $this->ehr_token->access_token);
+            $this->ehr_token);
         return $result;
     }
 }
