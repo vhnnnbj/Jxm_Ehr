@@ -61,20 +61,8 @@ class EhrAuthRpc
         }
         $client = new Client(config('ehr.service') . 'archive/info', false);
         $client->setTimeout(60000);
-//        Log::info('test:' . $client->test('is a test mesg', new InvokeSettings(['mode' => ResultMode::Normal])));
         $this->resultInfos = $client->import(json_encode($this->allInfos),
             new InvokeSettings(['mode' => ResultMode::Normal]));
-        Log::info('import result', $this->resultInfos);
-//        foreach ($this->allInfos as $info) {
-//            Log::info('syncOne', $info);
-//            $result = $client->syncOne(json_encode($info), new InvokeSettings(['mode' => ResultMode::Normal]));
-//            Log::info('syncOne Result', $result);
-//            if ($result['res'] == 'success') {
-//                $this->resultInfos['success'][] = $result;
-//            } else {
-//                $this->resultInfos['fail'][] = $result;
-//            }
-//        }
         return $this->resultInfos;
     }
 
@@ -99,14 +87,12 @@ class EhrAuthRpc
 
     public function updateEditor()
     {
-        Log::info('editorInfos', $this->editorInfos);
         if (sizeof($this->editorInfos) == 0) {
             return null;
         }
         $client = new Client(config('ehr.service') . 'archive/info', false);
         $res = $client->updateEditor(json_encode($this->editorInfos),
             new InvokeSettings(['mode' => ResultMode::Normal]));
-        Log::info('update result', $res);
         return $res;
     }
 }

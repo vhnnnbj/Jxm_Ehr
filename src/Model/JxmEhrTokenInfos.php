@@ -49,7 +49,7 @@ class JxmEhrTokenInfos extends Model
         return $this->morphTo();
     }
 
-    public function is_expire()
+    public function is_expire(): bool
     {
         return now()->lt(Carbon::parse($this->expires_at));
     }
