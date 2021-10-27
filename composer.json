@@ -12,7 +12,7 @@
     "hprose/hprose": "^2.0",
     "laravel/framework": ">=6.20",
     "ext-json": "*",
-    "guzzlehttp/guzzle": "~6.0|7.*"
+    "guzzlehttp/guzzle": "6.*|7.*"
   },
   "autoload": {
     "psr-4": {
