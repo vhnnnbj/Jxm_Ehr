@@ -24,9 +24,9 @@ class EhrServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->publishes([
-            __DIR__ . '../config/ehr.php' => config_path('ehr.php'),
+            __DIR__ . '/../config/ehr.php' => config_path('ehr.php'),
         ], 'ehr_config');
-        $this->loadMigrationsFrom(__DIR__ . '../database/migrations');
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
 //        $this->loadRoutesFrom(__DIR__ . '../route/route.php');
     }
 }

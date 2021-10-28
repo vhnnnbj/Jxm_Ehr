@@ -42,16 +42,19 @@ class EhrAuthApi
                 'refresh_token' => $login_result['refresh_token'],
                 'expires_at' => now()->addSeconds($login_result['expires_in']),
             ]);
-            $response = (new Client())->post(config('ehr.api') . 'auth/info', [
-                'headers' => [
-                    'X-Requested-With' => 'XMLHttpRequest',
-                    'Authorization' => $login_result['token_type'] . ' ' . $login_result['access_token'],
-                ],
-            ]);
+            $response = JxmEhrAccessHelper::postApi($error, config('ehr.api') . 'auth/info',
+                $token);
             $result = json_decode($response->getBody()->getContents(), true);
             return $result;
         } catch (\Exception $exception) {
             abort(401, '登录失败，账号名或者密码错误！');
         }
+    }
+
+    public static function checkToken(JxmEhrTokenInfos $token)
+    {
+        $result = JxmEhrAccessHelper::postApi($error, config('ehr.api') . 'auth/info',
+            $token);
+        return $result;
     }
 }

@@ -4,9 +4,8 @@
 namespace Jxm\Ehr;
 
 
-use Jxm\Ehr\Model\JxmEhrTokenInfos;
 use GuzzleHttp\Client;
-use Illuminate\Support\Facades\Log;
+use Jxm\Ehr\Model\JxmEhrTokenInfos;
 
 class JxmEhrAccessHelper
 {
@@ -27,10 +26,5 @@ class JxmEhrAccessHelper
             $error = $exception->getMessage();
             return null;
         }
-    }
-
-    public static function postOauth()
-    {
-
     }
 }
