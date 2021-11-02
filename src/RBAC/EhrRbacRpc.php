@@ -16,9 +16,10 @@ class EhrRbacRpc
     #region Menus
     private $menuInfos = [];
     private $editorInfos = [];
-    private $menu_keys = ['id', 'name', 'url', 'icon', 'sort', 'path', 'editor_ehr_id',
+    private $menu_keys = ['id', 'name', 'url', 'icon',
+        'sort', 'path', 'editor_ehr_id',
         'children', 'resources'];
-    private $res_keys = ['id', 'name', 'type'];
+    private $res_keys = ['id', 'name'];
 
     public function addMenus(&$error, $allMenus): bool
     {
@@ -48,30 +49,72 @@ class EhrRbacRpc
         }
     }
 
-    public function sendMenus(&$error)
+    public function sendMenus(&$error, $app_id = '')
     {
         Log::info('sendInfos', $this->menuInfos);
         if (sizeof($this->menuInfos) == 0) {
             $error = '没有已添加的菜单信息！';
             return null;
         }
-        if (config('ehr.bg_id') == 0 || config('ehr.app_id') == '0') {
+        $app_id = $app_id ?: config('ehr.app_id');
+        if (config('ehr.bg_id') == '' || $app_id == '') {
             $error = '请完善BG和APP的信息！';
             return null;
         }
-        $client = new Client(config('ehr.service') . 'rbac/rbac', false);
-        $client->setTimeout(60000);
-        $this->resultInfos = $client->importMenuInfo(json_encode($this->allInfos),
-            config('ehr.bg_id'), config('ehr.app_id'),
-            new InvokeSettings(['mode' => ResultMode::Normal]));
-        return $this->resultInfos;
+        try {
+            $client = new Client(config('ehr.service') . 'rbac/rbac', false);
+            $this->resultInfos = $client->importMenuInfo(json_encode($this->menuInfos),
+                config('ehr.bg_id'), $app_id,
+                new InvokeSettings(['mode' => ResultMode::Normal]));
+            return $this->resultInfos;
+        } catch (\Exception $ex) {
+            return [
+                'code' => 10,
+                'msg' => $ex->getMessage(),
+                'trace' => $ex->getTrace(),
+            ];
+        }
     }
     #endregion
 
     #region Roles
-    public function addRoles($roleInfos)
-    {
+    private $role_keys = ['id', 'name', 'app_id', 'permission_ehr_ids'];
+    private $roleInfos = [];
 
+    public function addRoles($id, $name, $menu_ehr_ids, $res_ehr_ids)
+    {
+        $this->roleInfos[] = [
+            'id' => $id,
+            'name' => $name,
+            'app_id' => config('ehr.app_id'),
+            'menu_ehr_ids' => $menu_ehr_ids,
+            'res_ehr_ids' => $res_ehr_ids,
+        ];
+        return sizeof($this->roleInfos);
+    }
+
+    public function sendRoles(&$error)
+    {
+        Log::info('importRolePermissionInfos', $this->roleInfos);
+        if (sizeof($this->roleInfos) == 0) {
+            $error = '没有已添加的菜单信息！';
+            return null;
+        }
+        if (config('ehr.bg_id') == '') {
+            $error = '请完善BG信息！';
+            return null;
+        }
+        try {
+            $client = new Client(config('ehr.service') . 'rbac/rbac', false);
+            $this->resultInfos = $client->importRolePermissionInfos(json_encode($this->roleInfos),
+                config('ehr.bg_id'), new InvokeSettings(['mode' => ResultMode::Normal]));
+            return $this->resultInfos;
+        } catch (\Exception $ex) {
+            return [
+                'code' => 10,
+                'msg' => $ex->getMessage(),
+            ];
+        }
     }
     #endregion
 }
