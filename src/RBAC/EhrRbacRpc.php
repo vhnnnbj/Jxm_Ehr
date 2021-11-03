@@ -21,7 +21,7 @@ class EhrRbacRpc
         'children', 'resources'];
     private $res_keys = ['id', 'name'];
 
-    public function addMenus(&$error, $allMenus): bool
+    public function addMenus(&$error, array $allMenus): bool
     {
         foreach ($allMenus as $menu) {
             $this->checkMenu($error, $menu);
@@ -31,7 +31,7 @@ class EhrRbacRpc
         return true;
     }
 
-    private function checkMenu(&$error, $menu)
+    private function checkMenu(&$error, array $menu): bool
     {
         if (!Arr::has($menu, $this->menu_keys)) {
             $error = '菜单信息必须包含以下：' . join(',', $this->menu_keys) . ',请确认后重新添加！';
@@ -81,12 +81,12 @@ class EhrRbacRpc
     private $role_keys = ['id', 'name', 'app_id', 'permission_ehr_ids'];
     private $roleInfos = [];
 
-    public function addRoles($id, $name, $menu_ehr_ids, $res_ehr_ids)
+    public function addRoles($id, $name, $menu_ehr_ids, $res_ehr_ids, $app_id = null)
     {
         $this->roleInfos[] = [
             'id' => $id,
             'name' => $name,
-            'app_id' => config('ehr.app_id'),
+            'app_id' => $app_id,
             'menu_ehr_ids' => $menu_ehr_ids,
             'res_ehr_ids' => $res_ehr_ids,
         ];
