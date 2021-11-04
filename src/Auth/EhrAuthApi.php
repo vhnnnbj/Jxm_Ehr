@@ -42,10 +42,8 @@ class EhrAuthApi
                 'refresh_token' => $login_result['refresh_token'],
                 'expires_at' => now()->addSeconds($login_result['expires_in']),
             ]);
-            $response = JxmEhrAccessHelper::postApi($error, config('ehr.api') . 'auth/info',
+            return JxmEhrAccessHelper::postApi($error, config('ehr.api') . 'auth/info',
                 $token);
-            $result = json_decode($response->getBody()->getContents(), true);
-            return $result;
         } catch (\Exception $exception) {
             abort(401, '登录失败，账号名或者密码错误！');
         }
