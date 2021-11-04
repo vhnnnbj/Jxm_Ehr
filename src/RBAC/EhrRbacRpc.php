@@ -15,7 +15,6 @@ class EhrRbacRpc
 
     #region Menus
     private $menuInfos = [];
-    private $editorInfos = [];
     private $menu_keys = ['id', 'name', 'url', 'icon',
         'sort', 'path', 'editor_ehr_id',
         'children', 'resources'];

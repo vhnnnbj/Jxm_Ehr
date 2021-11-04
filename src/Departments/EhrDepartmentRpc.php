@@ -9,6 +9,7 @@ use Hprose\InvokeSettings;
 use Hprose\ResultMode;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
+use phpDocumentor\Reflection\Types\Array_;
 
 class EhrDepartmentRpc
 {
@@ -16,11 +17,9 @@ class EhrDepartmentRpc
 
     #region Department
     private $departmentInfos = [];
-    private $editorInfos = [];
     private $department_keys = ['id', 'name', 'describe', 'children', 'editor_ehr_id', 'address',
         'subway', 'bus_routes'];
 
-//    private $res_keys = ['id', 'name'];
     public function setDepartments(&$error, array $allDeparts)
     {
         foreach ($allDeparts as $depart) {
@@ -30,10 +29,12 @@ class EhrDepartmentRpc
         $this->departmentInfos = $allDeparts;
     }
 
-    private function checkDepartment(&$error, array $department)
+    private function checkDepartment(&$error, $department)
     {
-        if (!Arr::has($department, $department_keys)) {
-            $error = '菜单信息必须包含以下：' . join(',', $this->department_keys) . ',请确认后重新添加！';
+        if (!is_array($department)) $department = $department->toArray();
+        if (!Arr::has($department, $this->department_keys)) {
+            $error = '菜单信息必须包含以下：' . join(',', $this->department_keys) . ',请确认后重新添加！' .
+                json_encode($department);
             return false;
         }
         foreach ($department['children'] as $child) {
@@ -44,9 +45,9 @@ class EhrDepartmentRpc
 
     public function sendDepartment(&$error, $app_id = null)
     {
-        Log::info('sendInfos', $this->menuInfos);
-        if (sizeof($this->menuInfos) == 0) {
-            $error = '没有已添加的菜单信息！';
+        Log::info('sendInfos', $this->departmentInfos);
+        if (sizeof($this->departmentInfos) == 0) {
+            $error = '没有已添加的部门信息！';
             return null;
         }
         $app_id = $app_id ?: config('ehr.app_id');
@@ -56,7 +57,7 @@ class EhrDepartmentRpc
         }
         try {
             $client = new Client(config('ehr.service') . 'bg/department', false);
-            $this->resultInfos = $client->importDepartments(json_encode($this->menuInfos),
+            $this->resultInfos = $client->importDepartments(json_encode($this->departmentInfos),
                 $app_id, config('ehr.bg_id'),
                 new InvokeSettings(['mode' => ResultMode::Normal]));
             return $this->resultInfos;
@@ -101,7 +102,7 @@ class EhrDepartmentRpc
         }
         try {
             $client = new Client(config('ehr.service') . 'bg/department', false);
-            $this->resultInfos = $client->importLocations(json_encode($this->menuInfos),
+            $this->resultInfos = $client->importLocations(json_encode($this->positionInfos),
                 config('ehr.bg_id'), $app_id,
                 new InvokeSettings(['mode' => ResultMode::Normal]));
             return $this->resultInfos;
