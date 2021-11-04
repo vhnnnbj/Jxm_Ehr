@@ -17,8 +17,8 @@ class CreateJxmEhrTokenInfosTable extends Migration
             $table->bigIncrements('id');
             $table->morphs('user', 'user');
             $table->string('token_type');
-            $table->string('access_token');
-            $table->string('refresh_token');
+            $table->text('access_token');
+            $table->text('refresh_token');
             $table->timestamp('expires_at')->nullable();
             $table->timestamps();
         });
