@@ -30,7 +30,7 @@ class EhrAuthRpc
         if (sizeof(Arr::where($this->allInfos, function ($item) use ($identity) {
                 return $item['identity'] == $identity;
             })) > 0) {
-            $error = makeErrorMsg('该身份证号已存在，不要重复添加！', 5);
+            $error = '该身份证号已存在，不要重复添加！';
             return false;
         }
         $this->allInfos[] = [
