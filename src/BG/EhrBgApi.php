@@ -22,7 +22,7 @@ class EhrBgApi
 
     private static function updateBgs($bgs)
     {
-        
+
         $result = JxmEhrAccessHelper::postApi($error, config('ehr.api') . 'bg/bg/groups', $token,
             [
                 'page' => 1,
@@ -37,6 +37,6 @@ class EhrBgApi
 
     public static function getBgs(JxmEhrTokenInfos $token, string $app_id)
     {
-        foreach ()
+        
     }
 }
