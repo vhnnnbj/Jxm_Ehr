@@ -32,9 +32,9 @@ trait HasEhrInfos
                     $departments = EhrDepartmentApi::getDepartments($department_ids);
                     $list->transform(function ($item) use ($departments) {
                         $item->setRelation(explode('_', $key)[0],
-                            Arr::first($departments, function ($department) use ($item) {
+                            collect(Arr::first($departments, function ($department) use ($item) {
                                 return $department['id'] == $item[$key];
-                            }));
+                            })));
                         return $item;
                     });
                     break;
@@ -43,9 +43,9 @@ trait HasEhrInfos
                     $users = EhrDepartmentApi::getDepartments($user_ids);
                     $list->transform(function ($item) use ($users) {
                         $item->setRelation(explode('_', $key)[0],
-                            Arr::first($users, function ($user) use ($item) {
+                            collect(Arr::first($users, function ($user) use ($item) {
                                 return $user['id'] == $item[$key];
-                            }));
+                            })));
                         return $item;
                     });
                     break;
