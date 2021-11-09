@@ -7,7 +7,7 @@ namespace Jxm\Ehr;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Jxm\Ehr\Model\JxmEhrTokenInfos;
 
-trait HasEhrInfo
+trait HasEhrTokenInfo
 {
     public function ehr_token(): MorphOne
     {
