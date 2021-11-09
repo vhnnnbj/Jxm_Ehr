@@ -10,9 +10,6 @@ use Jxm\Ehr\Model\JxmEhrTokenInfos;
 
 class EhrAppApi
 {
-    public function getMenus(&$error, JxmEhrTokenInfos $token, $dealPermission, $withResources)
-    {
-        JxmEhrAccessHelper::postApi($error, config('ehr.api') . 'app/department', $token);
-    }
+    
 
 }
