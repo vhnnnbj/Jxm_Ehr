@@ -3,8 +3,6 @@
 
 namespace Jxm\Ehr\Departments;
 
-use Carbon\Carbon;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redis;
 use Jxm\Ehr\JxmEhrAccessHelper;

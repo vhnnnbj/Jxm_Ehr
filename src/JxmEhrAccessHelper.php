@@ -6,6 +6,7 @@ namespace Jxm\Ehr;
 
 use GuzzleHttp\Client;
 use Jxm\Ehr\Model\JxmEhrTokenInfos;
+use Jxm\Tool\Tool;
 
 class JxmEhrAccessHelper
 {
@@ -26,5 +27,13 @@ class JxmEhrAccessHelper
             $error = $exception->getMessage();
             return null;
         }
+    }
+
+    public static function postRpc(string $module, string $class, string $method, array $args)
+    {
+        $client = new \Hprose\Http\Client(config('ehr.service') . $module . '/helper/' . $class, false);
+        $client->byref = true;
+        $result = $client->invoke($method, $args);
+        return $result;
     }
 }

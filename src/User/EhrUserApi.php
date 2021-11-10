@@ -1,6 +1,10 @@
 <?php
 
+namespace Jxm\Ehr\User;
+
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Jxm\Ehr\JxmEhrAccessHelper;
 
 class EhrUserApi
 {
@@ -26,13 +30,13 @@ class EhrUserApi
             else
                 $none[] = $user_id;
         }
-        if ($sizeof($none) > 0) {
+        if (sizeof($none) > 0) {
             $result = JxmEhrAccessHelper::postApi($error, config('ehr.api') . 'archive/account/someInfos',
                 Auth::user()->ehr_token, [
                     'user_ids' => join(',', $none),
                 ]);
             if ($error) throw new \Exception($error);
-            $get_users = $result['data']['infos'];
+            $get_users = $result['data']['users'];
             self::cacheAll($get_users);
             $users = array_merge($users, $get_users);
         }

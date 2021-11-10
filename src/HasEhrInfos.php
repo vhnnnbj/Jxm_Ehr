@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Jxm\Ehr\Departments\EhrDepartmentApi;
+use Jxm\Ehr\User\EhrUserApi;
 
 trait HasEhrInfos
 {
@@ -30,9 +31,9 @@ trait HasEhrInfos
                 case 5:
                     $department_ids = $list->pluck($key)->toArray();
                     $departments = EhrDepartmentApi::getDepartments($department_ids);
-                    $list->transform(function ($item) use ($departments) {
+                    $list->transform(function ($item) use ($departments, $key) {
                         $item->setRelation(explode('_', $key)[0],
-                            collect(Arr::first($departments, function ($department) use ($item) {
+                            collect(Arr::first($departments, function ($department) use ($item, $key) {
                                 return $department['id'] == $item[$key];
                             })));
                         return $item;
@@ -40,10 +41,10 @@ trait HasEhrInfos
                     break;
                 case 6:
                     $user_ids = $list->pluck($key)->toArray();
-                    $users = EhrDepartmentApi::getDepartments($user_ids);
-                    $list->transform(function ($item) use ($users) {
+                    $users = EhrUserApi::getUsers($user_ids);
+                    $list->transform(function ($item) use ($users, $key) {
                         $item->setRelation(explode('_', $key)[0],
-                            collect(Arr::first($users, function ($user) use ($item) {
+                            collect(Arr::first($users, function ($user) use ($item, $key) {
                                 return $user['id'] == $item[$key];
                             })));
                         return $item;
