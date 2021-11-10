@@ -10,6 +10,6 @@ use Jxm\Ehr\Model\JxmEhrTokenInfos;
 
 class EhrAppApi
 {
-    
+
 
 }
