@@ -12,20 +12,27 @@ use Jxm\Ehr\User\EhrUserApi;
 
 trait HasEhrInfos
 {
-//    public $key_types = [
-//        'department' => 5,
-//        'user' => 6,
-//        'bg' => 7,
-//        'app' => 8,
-//    ];
-
-    abstract public function setEhrInfo(&$list);
-
-    public static function setEhrInfos(Collection &$list, $keys = [
-        'department_id' => 5,
-        'editor_id' => 6,
-    ])
+    private static function ehrKeys(): array
     {
+        return [
+            'department_id' => 5,
+            'editor_id' => 6,
+        ];
+    }
+
+    public static function setEhrList(&$list)
+    {
+        return self::setEhrInfos($list, self::ehrKeys());
+    }
+
+    public static function setOneEhr(&$item)
+    {
+        return self::setOneEhrInfo($item, self::ehrKeys());
+    }
+
+    private static function setEhrInfos(Collection &$list, $keys = null)
+    {
+        if (!$keys) $keys = self::ehrKeys();
         foreach (array_keys($keys) as $key) {
             switch ($keys[$key]) {
                 case 5:
@@ -49,6 +56,31 @@ trait HasEhrInfos
                             })));
                         return $item;
                     });
+                    break;
+            }
+        }
+    }
+
+    private static function setOneEhrInfo(&$item, $keys = null)
+    {
+        if (!$keys) $keys = self::ehrKeys();
+        foreach (array_keys($keys) as $key) {
+            switch ($keys[$key]) {
+                case 5:
+                    $department_ids = $item[$key];
+                    $departments = EhrDepartmentApi::getDepartments($department_ids);
+                    $item->setRelation(explode('_', $key)[0],
+                        collect(Arr::first($departments, function ($department) use ($item, $key) {
+                            return $department['id'] == $item[$key];
+                        })));
+                    break;
+                case 6:
+                    $user_ids = $item[$key];
+                    $users = EhrUserApi::getUsers($user_ids);
+                    $item->setRelation(explode('_', $key)[0],
+                        collect(Arr::first($users, function ($user) use ($item, $key) {
+                            return $user['id'] == $item[$key];
+                        })));
                     break;
             }
         }
