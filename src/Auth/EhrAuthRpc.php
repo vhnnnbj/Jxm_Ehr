@@ -62,6 +62,7 @@ class EhrAuthRpc
         $client = new Client(config('ehr.service') . 'archive/info', false);
         $client->setTimeout(60000);
         $this->resultInfos = $client->import(json_encode($this->allInfos),
+            config('ehr.bg_id'),
             new InvokeSettings(['mode' => ResultMode::Normal]));
         return $this->resultInfos;
     }
