@@ -15,8 +15,8 @@ trait HasEhrInfos
     private static function ehrKeys(): array
     {
         return [
-            'department_id' => 5,
-            'editor_id' => 6,
+            'department_id' => EhrCode::EhrKey_Department,
+            'editor_id' => EhrCode::EhrKey_UserInfo,
         ];
     }
 
@@ -39,10 +39,11 @@ trait HasEhrInfos
                     $department_ids = $list->pluck($key)->toArray();
                     $departments = EhrDepartmentApi::getDepartments($department_ids);
                     $list->transform(function ($item) use ($departments, $key) {
+                        $info = Arr::first($departments, function ($department) use ($item, $key) {
+                            return $department['id'] == $item[$key];
+                        });
                         $item->setRelation(explode('_', $key)[0],
-                            collect(Arr::first($departments, function ($department) use ($item, $key) {
-                                return $department['id'] == $item[$key];
-                            })));
+                            $info ? collect($info) : null);
                         return $item;
                     });
                     break;
@@ -50,10 +51,11 @@ trait HasEhrInfos
                     $user_ids = $list->pluck($key)->toArray();
                     $users = EhrUserApi::getUsers($user_ids);
                     $list->transform(function ($item) use ($users, $key) {
+                        $info = Arr::first($users, function ($user) use ($item, $key) {
+                            return $user['id'] == $item[$key];
+                        });
                         $item->setRelation(explode('_', $key)[0],
-                            collect(Arr::first($users, function ($user) use ($item, $key) {
-                                return $user['id'] == $item[$key];
-                            })));
+                            $info ? collect($info) : null);
                         return $item;
                     });
                     break;
@@ -67,20 +69,22 @@ trait HasEhrInfos
         foreach (array_keys($keys) as $key) {
             switch ($keys[$key]) {
                 case 5:
-                    $department_ids = $item[$key];
+                    $department_ids = [$item[$key]];
                     $departments = EhrDepartmentApi::getDepartments($department_ids);
+                    $info = Arr::first($departments, function ($department) use ($item, $key) {
+                        return $department['id'] == $item[$key];
+                    });
                     $item->setRelation(explode('_', $key)[0],
-                        collect(Arr::first($departments, function ($department) use ($item, $key) {
-                            return $department['id'] == $item[$key];
-                        })));
+                        $info ? collect($info) : null);
                     break;
                 case 6:
-                    $user_ids = $item[$key];
+                    $user_ids = [$item[$key]];
                     $users = EhrUserApi::getUsers($user_ids);
+                    $info = Arr::first($users, function ($user) use ($item, $key) {
+                        return $user['id'] == $item[$key];
+                    });
                     $item->setRelation(explode('_', $key)[0],
-                        collect(Arr::first($users, function ($user) use ($item, $key) {
-                            return $user['id'] == $item[$key];
-                        })));
+                        $info ? collect($info) : null);
                     break;
             }
         }
