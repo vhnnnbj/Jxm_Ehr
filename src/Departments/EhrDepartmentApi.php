@@ -89,7 +89,7 @@ class EhrDepartmentApi
         return $departments;
     }
 
-    public static function getDepartments(array $department_ids)
+    public static function getDepartments(array $department_ids, $fields = null)
     {
         $departments = [];
         $none = [];
@@ -104,6 +104,7 @@ class EhrDepartmentApi
             $result = JxmEhrAccessHelper::postApi($error, config('ehr.api') . 'bg/department/someInfos',
                 Auth::user()->ehr_token, [
                     'department_ids' => join(',', $none),
+                    'fields' => $fields,
                 ]);
             if ($error) throw new \Exception($error);
             $get_departments = $result['data']['departments'];

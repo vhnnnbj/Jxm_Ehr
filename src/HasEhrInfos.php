@@ -67,25 +67,48 @@ trait HasEhrInfos
     {
         if (!$keys) $keys = self::ehrKeys();
         foreach (array_keys($keys) as $key) {
-            switch ($keys[$key]) {
-                case 5:
-                    $department_ids = [$item[$key]];
-                    $departments = EhrDepartmentApi::getDepartments($department_ids);
-                    $info = Arr::first($departments, function ($department) use ($item, $key) {
-                        return $department['id'] == $item[$key];
-                    });
-                    $item->setRelation(explode('_', $key)[0],
-                        $info ? collect($info) : null);
-                    break;
-                case 6:
-                    $user_ids = [$item[$key]];
-                    $users = EhrUserApi::getUsers($user_ids);
-                    $info = Arr::first($users, function ($user) use ($item, $key) {
-                        return $user['id'] == $item[$key];
-                    });
-                    $item->setRelation(explode('_', $key)[0],
-                        $info ? collect($info) : null);
-                    break;
+            if (is_array($keys[$key])) {
+                switch ($keys[$key][0]) {
+                    case 5:
+                        $department_ids = [$item[$key]];
+                        $departments = EhrDepartmentApi::getDepartments($department_ids, $keys[$key][1]);
+                        $info = Arr::first($departments, function ($department) use ($item, $key) {
+                            return $department['id'] == $item[$key];
+                        });
+                        $item->setRelation(explode('_', $key)[0],
+                            $info ? collect($info) : null);
+                        break;
+                    case 6:
+                        $user_ids = [$item[$key]];
+                        $users = EhrUserApi::getUsers($user_ids, $keys[$key][1]);
+                        $info = Arr::first($users, function ($user) use ($item, $key) {
+                            return $user['id'] == $item[$key];
+                        });
+                        $item->setRelation(explode('_', $key)[0],
+                            $info ? collect($info) : null);
+                        break;
+                }
+            } else {
+                switch ($keys[$key]) {
+                    case 5:
+                        $department_ids = [$item[$key]];
+                        $departments = EhrDepartmentApi::getDepartments($department_ids);
+                        $info = Arr::first($departments, function ($department) use ($item, $key) {
+                            return $department['id'] == $item[$key];
+                        });
+                        $item->setRelation(explode('_', $key)[0],
+                            $info ? collect($info) : null);
+                        break;
+                    case 6:
+                        $user_ids = [$item[$key]];
+                        $users = EhrUserApi::getUsers($user_ids);
+                        $info = Arr::first($users, function ($user) use ($item, $key) {
+                            return $user['id'] == $item[$key];
+                        });
+                        $item->setRelation(explode('_', $key)[0],
+                            $info ? collect($info) : null);
+                        break;
+                }
             }
         }
     }

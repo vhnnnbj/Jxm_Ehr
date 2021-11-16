@@ -19,7 +19,7 @@ class EhrUserApi
         }
     }
 
-    public static function getUsers($user_ids)
+    public static function getUsers($user_ids, $fields = null)
     {
         $users = [];
         $none = [];
@@ -34,6 +34,7 @@ class EhrUserApi
             $result = JxmEhrAccessHelper::postApi($error, config('ehr.api') . 'archive/account/someInfos',
                 Auth::user()->ehr_token, [
                     'user_ids' => join(',', $none),
+                    'fields' => $fields,
                 ]);
             if ($error) throw new \Exception($error);
             $get_users = $result['data']['users'];
