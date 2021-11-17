@@ -34,31 +34,60 @@ trait HasEhrInfos
     {
         if (!$keys) $keys = self::ehrKeys();
         foreach (array_keys($keys) as $key) {
-            switch ($keys[$key]) {
-                case 5:
-                    $department_ids = $list->pluck($key)->toArray();
-                    $departments = EhrDepartmentApi::getDepartments($department_ids);
-                    $list->transform(function ($item) use ($departments, $key) {
-                        $info = Arr::first($departments, function ($department) use ($item, $key) {
-                            return $department['id'] == $item[$key];
+            if (is_array($keys[$key])) {
+                switch ($keys[$key][0]) {
+                    case 5:
+                        $department_ids = $list->pluck($key)->toArray();
+                        $departments = EhrDepartmentApi::getDepartments($department_ids, $keys[$key][1]);
+                        $list->transform(function ($item) use ($departments, $key) {
+                            $info = Arr::first($departments, function ($department) use ($item, $key) {
+                                return $department['id'] == $item[$key];
+                            });
+                            $item->setRelation(explode('_', $key)[0],
+                                $info ? collect($info) : null);
+                            return $item;
                         });
-                        $item->setRelation(explode('_', $key)[0],
-                            $info ? collect($info) : null);
-                        return $item;
-                    });
-                    break;
-                case 6:
-                    $user_ids = $list->pluck($key)->toArray();
-                    $users = EhrUserApi::getUsers($user_ids);
-                    $list->transform(function ($item) use ($users, $key) {
-                        $info = Arr::first($users, function ($user) use ($item, $key) {
-                            return $user['id'] == $item[$key];
+                        break;
+                    case 6:
+                        $user_ids = $list->pluck($key)->toArray();
+                        $users = EhrUserApi::getUsers($user_ids, $keys[$key][1]);
+                        $list->transform(function ($item) use ($users, $key) {
+                            $info = Arr::first($users, function ($user) use ($item, $key) {
+                                return $user['id'] == $item[$key];
+                            });
+                            $item->setRelation(explode('_', $key)[0],
+                                $info ? collect($info) : null);
+                            return $item;
                         });
-                        $item->setRelation(explode('_', $key)[0],
-                            $info ? collect($info) : null);
-                        return $item;
-                    });
-                    break;
+                        break;
+                }
+            } else {
+                switch ($keys[$key]) {
+                    case 5:
+                        $department_ids = $list->pluck($key)->toArray();
+                        $departments = EhrDepartmentApi::getDepartments($department_ids);
+                        $list->transform(function ($item) use ($departments, $key) {
+                            $info = Arr::first($departments, function ($department) use ($item, $key) {
+                                return $department['id'] == $item[$key];
+                            });
+                            $item->setRelation(explode('_', $key)[0],
+                                $info ? collect($info) : null);
+                            return $item;
+                        });
+                        break;
+                    case 6:
+                        $user_ids = $list->pluck($key)->toArray();
+                        $users = EhrUserApi::getUsers($user_ids);
+                        $list->transform(function ($item) use ($users, $key) {
+                            $info = Arr::first($users, function ($user) use ($item, $key) {
+                                return $user['id'] == $item[$key];
+                            });
+                            $item->setRelation(explode('_', $key)[0],
+                                $info ? collect($info) : null);
+                            return $item;
+                        });
+                        break;
+                }
             }
         }
     }
