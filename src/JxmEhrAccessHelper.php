@@ -10,7 +10,39 @@ use Jxm\Tool\Tool;
 
 class JxmEhrAccessHelper
 {
-    public static function postApi(&$error, $url, JxmEhrTokenInfos $tokenInfos, $params = [], $method = 'POST')
+    public static function validate(&$error, $infos, $rules, $msgs = null, $attributes = null): bool
+    {
+        $result = self::api($error, 'helper/checkData', null, [
+            'rules' => $rules,
+            'infos' => $infos,
+            'msg' => $msgs,
+            'attributes' => $attributes,
+        ]);
+        if ($result['code'] == 422) {
+            $error = $result;
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public static function api(&$error, $url, $tokenInfos, $params = [])
+    {
+        return self::postApi($error, config('ehr.api') . $url, $tokenInfos, $params);
+    }
+
+    /**
+     * Notes:
+     * User: harden - 2021/11/19 上午9:51
+     * @param $error
+     * @param $url
+     * @param JxmEhrTokenInfos|null $tokenInfos
+     * @param array $params
+     * @param string $method
+     * @return mixed|null
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public static function postApi(&$error, $url, $tokenInfos, $params = [], $method = 'POST')
     {
         try {
             $response = (new Client())->post($url, [
