@@ -13,7 +13,8 @@ use Jxm\Tool\Tool;
 
 class JxmEhrAccessHelper
 {
-    public static function validate(&$error, $infos, $rules, $msgs = null, $attributes = null): bool
+    public static function validate(&$error, $infos, $rules, $msgs = null,
+                                    $attributes = null): bool
     {
         $result = self::api($error, 'helper/checkData', null, [
             'rules' => $rules,
@@ -35,7 +36,7 @@ class JxmEhrAccessHelper
     }
 
     /**
-     * Notes:
+     * Notes: api访问
      * User: harden - 2021/11/19 上午9:51
      * @param $error
      * @param $url
@@ -45,16 +46,21 @@ class JxmEhrAccessHelper
      * @return mixed|null
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public static function postApi(&$error, $url, $tokenInfos, $params = [], $method = 'POST')
+    public static function postApi(&$error, $url, $tokenInfos, $params = [],
+                                   $method = 'POST', $app_id = null)
     {
         try {
+            if (!$app_id) $app_id = config('ehr.app_id', null);
+            if (!$app_id) $error = '需要提供appid才可访问!';
             $response = (new Client())->post($url, [
                 'headers' => array_merge([
                     'X-Requested-With' => 'XMLHttpRequest',
                 ], $tokenInfos ? [
                     'Authorization' => $tokenInfos->token_type . ' ' . $tokenInfos->access_token,
                 ] : []),
-                'form_params' => $params,
+                'form_params' => array_merge($params, [
+                    'app_id' => $app_id,
+                ]),
             ]);
             $result = json_decode($response->getBody()->getContents(), true);
             return $result;
@@ -85,8 +91,6 @@ class JxmEhrAccessHelper
             Cache::set('ehr.data.connection.config', $conn, 3);
         }
         return json_decode($conn, true);
-//        config()->set('database.connections.mysql_ehr', $conn);
-//        return 'database.connections.mysql_ehr';
     }
     #endregion
 }
