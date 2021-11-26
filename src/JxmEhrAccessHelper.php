@@ -70,7 +70,7 @@ class JxmEhrAccessHelper
         }
     }
 
-    public static function postRpc(string $module, string $class, string $method, array $args)
+    public static function rpc(string $module, string $class, string $method, array $args)
     {
         $client = new \Hprose\Http\Client(config('ehr.service') . $module . '/helper/' . $class, false);
         $client->byref = true;
