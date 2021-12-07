@@ -48,17 +48,23 @@ class JxmEhrAccessHelper
                                    $method = 'POST', $app_id = null)
     {
         try {
-            if (!$app_id) $app_id = config('ehr.app_id', null);
-            if (!$app_id) $error = '需要提供appid才可访问!';
+            if (!$app_id && !array_key_exists('app_id', $params)) {
+                $app_id = config('ehr.app_id', null);
+                if (!$app_id) {
+                    $error = '需要提供appid才可访问!';
+                    return null;
+                }
+                $params = array_merge($params, [
+                    'app_id' => $app_id,
+                ]);
+            }
             $response = (new Client())->post($url, [
                 'headers' => array_merge([
                     'X-Requested-With' => 'XMLHttpRequest',
                 ], $tokenInfos ? [
                     'Authorization' => $tokenInfos->token_type . ' ' . $tokenInfos->access_token,
                 ] : []),
-                'form_params' => array_merge($params, [
-                    'app_id' => $app_id,
-                ]),
+                'form_params' => $params,
             ]);
             $result = json_decode($response->getBody()->getContents(), true);
             return $result;
