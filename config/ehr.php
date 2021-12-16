@@ -30,4 +30,8 @@ return [
     ],
     'bg_id' => env('EHR_BG_ID', 0),
     'app_id' => env('EHR_APP_ID', '0'),
+
+    'broadcast' => [
+        'port' => env('EHR_BROADCAST_PORT', 1980),
+    ]
 ];
