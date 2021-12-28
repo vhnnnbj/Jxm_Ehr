@@ -30,6 +30,9 @@ trait HasEhrTokenInfo
         }
         $result = JxmEhrAccessHelper::postApi($error, config('ehr.api') . 'auth/info',
             $this->ehr_token);
+        if (!$result) {
+            abort(403, $error);
+        }
         return $result;
     }
 }
