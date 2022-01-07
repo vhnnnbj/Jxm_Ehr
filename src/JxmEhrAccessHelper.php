@@ -7,7 +7,6 @@ namespace Jxm\Ehr;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 use Jxm\Ehr\Model\JxmEhrTokenInfos;
 
 class JxmEhrAccessHelper
