@@ -7,6 +7,7 @@ namespace Jxm\Ehr;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Jxm\Ehr\Model\JxmEhrTokenInfos;
 
 class JxmEhrAccessHelper
@@ -87,12 +88,13 @@ class JxmEhrAccessHelper
     {
         $conn = Cache::get('ehr.data.connection.config', null);
         if (!$conn) {
-            $result = JxmEhrAccessHelper::api($error, 'helper/dataConn', Auth::user()->ehr_token);
+            $token = JxmEhrTokenInfos::where('user_id', Auth::user()->id)->first();
+            $result = JxmEhrAccessHelper::api($error, 'helper/dataConn', $token);
             if ($error) {
                 return null;
             }
             $conn = json_encode($result['mysql']);
-            Cache::set('ehr.data.connection.config', $conn, 3);
+            Cache::set('ehr.data.connection.config', $conn, 30);
         }
         return json_decode($conn, true);
     }
