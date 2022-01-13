@@ -90,7 +90,7 @@ class JxmEhrAccessHelper
             $token = JxmEhrTokenInfos::where('user_id', Auth::user()->id)->first();
             $result = JxmEhrAccessHelper::api($error, 'helper/dataConn', $token);
             if ($error) {
-                return null;
+                abort(403);
             }
             $conn = json_encode($result['mysql']);
             Cache::set('ehr.data.connection.config', $conn, 30);
