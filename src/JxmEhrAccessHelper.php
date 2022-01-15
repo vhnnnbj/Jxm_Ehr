@@ -7,6 +7,8 @@ namespace Jxm\Ehr;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Jxm\Ehr\Model\JxmEhrTokenInfos;
 
 class JxmEhrAccessHelper
@@ -20,6 +22,9 @@ class JxmEhrAccessHelper
             'msg' => $msgs,
             'attributes' => $attributes,
         ]);
+        if ($error) {
+            return false;
+        }
         if ($result['code'] == 422) {
             $error = $result;
             return false;
@@ -58,6 +63,8 @@ class JxmEhrAccessHelper
                     'app_id' => $app_id,
                 ]);
             }
+            Log::info('token', ['token' => $tokenInfos]);
+            $client = new Client();
             $response = (new Client())->post($url, [
                 'headers' => array_merge([
                     'X-Requested-With' => 'XMLHttpRequest',
