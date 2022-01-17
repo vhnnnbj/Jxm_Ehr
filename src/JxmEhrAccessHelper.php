@@ -4,10 +4,8 @@
 namespace Jxm\Ehr;
 
 
-use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Jxm\Ehr\Model\JxmEhrTokenInfos;
 
@@ -23,9 +21,6 @@ class JxmEhrAccessHelper
             'attributes' => $attributes,
         ]);
         if ($error) {
-            return false;
-        }
-        if ($result['code'] == 422) {
             $error = $result;
             return false;
         } else {
@@ -63,20 +58,48 @@ class JxmEhrAccessHelper
                     'app_id' => $app_id,
                 ]);
             }
-            Log::info('token', ['token' => $tokenInfos]);
-            $client = new Client();
-            $response = (new Client())->post($url, [
-                'headers' => array_merge([
-                    'X-Requested-With' => 'XMLHttpRequest',
-                ], $tokenInfos ? [
-                    'Authorization' => $tokenInfos->token_type . ' ' . $tokenInfos->access_token,
-                ] : []),
-                'form_params' => $params,
-            ]);
-            $result = json_decode($response->getBody()->getContents(), true);
+            $headers = array_merge([
+                'X-Requested-With:XMLHttpRequest',
+                'Content-Type:application/json; charset=utf-8',
+                'Content-Length:' . strlen(json_encode($params)),
+            ], $tokenInfos ? [
+                'Authorization:' . $tokenInfos->token_type . ' ' . $tokenInfos->access_token,
+            ] : []);
+            $curl = curl_init($url);
+            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
+            if (is_array($params)) {
+                $params = json_encode($params);
+            }
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $params);
+//            curl_setopt($curl, CURLOPT_HEADER, $headers);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+            $res = curl_exec($curl);
+            $errorno = curl_errno($curl);
+            $status_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            Log::info('res', ['code' => $status_code, 'no' => $errorno, 'res' => $res]);
+            if ($errorno) {
+                abort(403, $errorno);
+            }
+            if ($status_code != 200) {
+                $error = $res;
+            }
+            curl_close($curl);
+            $result = json_decode($res, true);
+
+//            $client = new Client();
+//            $response = (new Client())->post($url, [
+//                'headers' => array_merge([
+//                    'X-Requested-With' => 'XMLHttpRequest',
+//                ], $tokenInfos ? [
+//                    'Authorization' => $tokenInfos->token_type . ' ' . $tokenInfos->access_token,
+//                ] : []),
+//                'form_params' => $params,
+//            ]);
+//            $result = json_decode($response->getBody()->getContents(), true);
             return $result;
         } catch (\Exception $exception) {
-            $error = $exception->getMessage();
+            abort(403, $exception->getMessage());
             return null;
         }
     }
