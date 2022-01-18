@@ -24,6 +24,7 @@ class EhrAuthApi
     {
 
         $client = new Client();
+        $response = null;
         try {
             $response = $client->request('POST', config('ehr.oauth') . 'token', [
                 'form_params' => [
@@ -45,7 +46,7 @@ class EhrAuthApi
             return JxmEhrAccessHelper::postApi($error, config('ehr.api') . 'auth/info',
                 $token);
         } catch (\Exception $exception) {
-            if ($response->getStatusCode() != 400)
+            if ($response && $response->getStatusCode() != 400)
                 Log::error('login fail:', $exception->getMessage());
             abort(403, '登录失败，账号名或者密码错误！');
         }
