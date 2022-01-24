@@ -4,22 +4,22 @@ return [
     /**
      * Ehr URL
      */
-    'url' => env('EHR_URL', 'http://192.168.130.103:6688/'),
+    'url' => env('EHR_URL'),
 
     /**
      * RPC Service
      */
-    'service' => env('EHR_URL', 'http://192.168.130.103:6688/') . 'api/service/',
+    'service' => env('EHR_URL') . 'api/service/',
 
     /**
      * API
      */
-    'api' => env('EHR_URL', 'http://192.168.130.103:6688/') . 'api/v1/',
+    'api' => env('EHR_URL') . 'api/v1/',
 
     /**
      * OAUTH URL
      */
-    'oauth' => env('EHR_URL', 'http://192.168.130.103:6688/') . 'oauth/',
+    'oauth' => env('EHR_URL') . 'oauth/',
 
     /**
      * CLIENT_INFO

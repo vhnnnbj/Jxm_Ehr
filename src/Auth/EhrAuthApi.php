@@ -48,7 +48,8 @@ class EhrAuthApi
         } catch (\Exception $exception) {
             if ($response && $response->getStatusCode() != 400)
                 Log::error('login fail:', $exception->getMessage());
-            abort(403, '登录失败，账号名或者密码错误！');
+            abort(403, $exception->getMessage());
+//            abort(403, '登录失败，账号名或者密码错误！');
         }
     }
 

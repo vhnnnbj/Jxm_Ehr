@@ -41,7 +41,7 @@ class JxmEhrAccessHelper
     /**
      * Notes: api访问
      * User: harden - 2021/11/19 上午9:51
-     * @param $error
+     * @param string $error
      * @param $url
      * @param JxmEhrTokenInfos|null $tokenInfos
      * @param array $params

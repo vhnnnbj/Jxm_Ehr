@@ -12,4 +12,9 @@ class BgDepartment extends EhrBasicModel
     {
         return $this->belongsTo(BgGroup::class);
     }
+
+    public function area(): BelongsTo
+    {
+        return $this->belongsTo(BgArea::class);
+    }
 }
