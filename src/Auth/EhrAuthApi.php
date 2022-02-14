@@ -26,22 +26,27 @@ class EhrAuthApi
         $client = new Client();
         $response = null;
         try {
-            $response = $client->request('POST', config('ehr.oauth') . 'token', [
+            //            $response = $client->request('POST', config('ehr.oauth') . 'token', [
+//                'form_params' => [
+//                    'grant_type' => 'password',
+//                    'client_id' => config('ehr.client.id'),
+//                    'client_secret' => config('ehr.client.secret'),
+//                    'username' => $username,
+//                    'password' => $password,
+//                    'scope' => '*',
+//                ]]);
+            $response = $client->request('POST', config('ehr.api') . 'auth/login', [
                 'form_params' => [
-                    'grant_type' => 'password',
-                    'client_id' => config('ehr.client.id'),
-                    'client_secret' => config('ehr.client.secret'),
-                    'username' => $username,
+                    'name' => $username,
                     'password' => $password,
-                    'scope' => '*',
+                    'app_id' => $app_id ?: config('ehr.app_id'),
                 ]]);
             $login_result = json_decode($response->getBody()->getContents(), true);
 
             $token = new JxmEhrTokenInfos([
-                'token_type' => $login_result['token_type'],
-                'access_token' => $login_result['access_token'],
-                'refresh_token' => $login_result['refresh_token'],
-                'expires_at' => now()->addSeconds($login_result['expires_in']),
+                'token_type' => $login_result['data']['token_type'],
+                'access_token' => $login_result['data']['access_token'],
+                'expires_at' => Carbon::parse($login_result['data']['expires_at']),
             ]);
             return JxmEhrAccessHelper::postApi($error, config('ehr.api') . 'auth/info',
                 $token);
