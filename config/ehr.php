@@ -17,6 +17,11 @@ return [
     'api' => env('EHR_URL') . 'api/v1/',
 
     /**
+     * App
+     */
+    'app' => env('EHR_URL') . 'api/a1/',
+
+    /**
      * OAUTH URL
      */
     'oauth' => env('EHR_URL') . 'oauth/',
