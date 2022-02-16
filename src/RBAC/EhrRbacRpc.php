@@ -81,12 +81,13 @@ class EhrRbacRpc
     private $role_keys = ['id', 'name', 'app_id', 'permission_ehr_ids'];
     private $roleInfos = [];
 
-    public function addRoles($id, $name, $menu_ehr_ids, $res_ehr_ids, $app_id = null)
+    public function addRoles($id, $name, $type, $menu_ehr_ids, $res_ehr_ids, $app_id = null)
     {
         $this->roleInfos[] = [
             'id' => $id,
             'name' => $name,
             'app_id' => $app_id,
+            'type' => $type,
             'menu_ehr_ids' => $menu_ehr_ids,
             'res_ehr_ids' => $res_ehr_ids,
         ];
