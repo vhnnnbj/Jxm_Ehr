@@ -9,6 +9,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class BgArea extends EhrBasicModel
 {
+    const State_Normal = 0;
+    const State_Stop = 50;
+
     public function bg(): BelongsTo
     {
         return $this->belongsTo(BgGroup::class);
