@@ -46,6 +46,7 @@ class EhrRbacRpc
                 return false;
             }
         }
+        return true;
     }
 
     public function sendMenus(&$error, $app_id = '')
