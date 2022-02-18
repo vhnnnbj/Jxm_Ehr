@@ -26,26 +26,18 @@ class EhrAuthApi
         $client = new Client();
         $response = null;
         try {
-            //            $response = $client->request('POST', config('ehr.oauth') . 'token', [
-//                'form_params' => [
-//                    'grant_type' => 'password',
-//                    'client_id' => config('ehr.client.id'),
-//                    'client_secret' => config('ehr.client.secret'),
-//                    'username' => $username,
-//                    'password' => $password,
-//                    'scope' => '*',
-//                ]]);
-            $response = $client->request('POST', config('ehr.api') . 'auth/login', [
-                'form_params' => [
+            $response = JxmEhrAccessHelper::api($error, 'auth/login',
+                null, [
                     'name' => $username,
                     'password' => $password,
-                    'app_id' => $app_id ?: config('ehr.app_id'),
-                ]]);
-            $login_result = json_decode($response->getBody()->getContents(), true);
+                    'app_id' => '70de37e8-d42e-406d-92b9-63e3a7fd4a4c',
+                ]);
+            $login_result = $response;
 
             $token = new JxmEhrTokenInfos([
                 'token_type' => $login_result['data']['token_type'],
                 'access_token' => $login_result['data']['access_token'],
+                'refresh_token' => '',
                 'expires_at' => Carbon::parse($login_result['data']['expires_at']),
             ]);
             return JxmEhrAccessHelper::postApi($error, config('ehr.api') . 'auth/info',
