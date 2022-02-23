@@ -20,7 +20,7 @@ use Modules\BaseFoundation\Entities\UserInfo;
 
 class EhrAuthApi
 {
-    public static function login($username, $password, &$token)
+    public static function login($username, $password, &$token, $app_id = null)
     {
 
         $client = new Client();
@@ -30,7 +30,7 @@ class EhrAuthApi
                 null, [
                     'name' => $username,
                     'password' => $password,
-                    'app_id' => '70de37e8-d42e-406d-92b9-63e3a7fd4a4c',
+                    'app_id' => $app_id ?: config('ehr.app_id'),
                 ]);
             $login_result = $response;
 
