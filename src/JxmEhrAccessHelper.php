@@ -33,6 +33,16 @@ class JxmEhrAccessHelper
         }
     }
 
+    /**
+     * Notes:
+     * User: harden - 2022/2/24 上午10:34
+     * @param $error
+     * @param $url
+     * @param $tokenInfos
+     * @param array $params
+     * @return array|null
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     public static function api(&$error, $url, $tokenInfos, $params = [])
     {
         return self::postApi($error, config('ehr.api') . $url, $tokenInfos, $params);
@@ -46,7 +56,7 @@ class JxmEhrAccessHelper
      * @param JxmEhrTokenInfos|null $tokenInfos
      * @param array $params
      * @param string $method
-     * @return mixed|null
+     * @return array|null
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function postApi(&$error, $url, $tokenInfos, $params = [],
@@ -65,7 +75,8 @@ class JxmEhrAccessHelper
             }
 
             $client = new Client();
-            $response = (new Client())->post($url, [
+            Log::info('params', $params);
+            $response = $client->request('POST', $url, [
                 'headers' => array_merge([
                     'X-Requested-With' => 'XMLHttpRequest',
                 ], $tokenInfos ? [
