@@ -5,6 +5,7 @@ namespace Jxm\Ehr;
 
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -62,6 +63,7 @@ class JxmEhrAccessHelper
     public static function postApi(&$error, $url, $tokenInfos, $params = [],
                                    $method = 'POST', $app_id = null)
     {
+        $response = null;
         try {
             if (!$app_id && !array_key_exists('app_id', $params)) {
                 $app_id = config('ehr.app_id', null);
@@ -86,9 +88,8 @@ class JxmEhrAccessHelper
             ]);
             $result = json_decode($response->getBody()->getContents(), true);
             return $result;
-        } catch (\Exception $exception) {
+        } catch (ClientException $exception) {
             abort(403, $exception->getMessage());
-            return null;
         }
     }
 

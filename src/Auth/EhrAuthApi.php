@@ -17,10 +17,11 @@ use Illuminate\Support\Facades\Log;
 use Jxm\Ehr\JxmEhrAccessHelper;
 use Jxm\Ehr\Model\JxmEhrTokenInfos;
 use Modules\BaseFoundation\Entities\UserInfo;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 class EhrAuthApi
 {
-    public static function login($username, $password, &$token, $app_id = null)
+    public static function login($username, $phone, $password, &$token, $app_id = null)
     {
 
         $client = new Client();
@@ -29,6 +30,7 @@ class EhrAuthApi
             $response = JxmEhrAccessHelper::api($error, 'auth/login',
                 null, [
                     'name' => $username,
+                    'phone' => $phone,
                     'password' => $password,
                     'app_id' => $app_id ?: config('ehr.app_id'),
                 ]);
@@ -42,11 +44,9 @@ class EhrAuthApi
             ]);
             return JxmEhrAccessHelper::postApi($error, config('ehr.api') . 'auth/info',
                 $token);
-        } catch (\Exception $exception) {
-            if ($response && $response->getStatusCode() != 400)
-                Log::error('login fail:', $exception->getMessage());
-            abort(403, $exception->getMessage());
-//            abort(403, '登录失败，账号名或者密码错误！');
+        } catch (HttpExceptionInterface $exception) {
+//            abort($exception->getStatusCode(), $exception->getMessage());
+            abort(403, '登录失败，账号名或者密码错误！');
         }
     }
 
