@@ -88,7 +88,7 @@ class JxmEhrAccessHelper
             ]);
             $result = json_decode($response->getBody()->getContents(), true);
             return $result;
-        } catch (ClientException $exception) {
+        } catch (\Exception $exception) {
             abort(403, $exception->getMessage());
         }
     }

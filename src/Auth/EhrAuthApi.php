@@ -44,7 +44,7 @@ class EhrAuthApi
             ]);
             return JxmEhrAccessHelper::postApi($error, config('ehr.api') . 'auth/info',
                 $token);
-        } catch (HttpExceptionInterface $exception) {
+        } catch (\Exception $exception) {
 //            abort($exception->getStatusCode(), $exception->getMessage());
             abort(403, '登录失败，账号名或者密码错误！');
         }
