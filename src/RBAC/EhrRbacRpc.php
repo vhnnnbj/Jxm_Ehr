@@ -78,10 +78,10 @@ class EhrRbacRpc
     #endregion
 
     #region Roles
-    private $role_keys = ['id', 'name', 'app_id', 'permission_ehr_ids'];
+    private $role_keys = ['id', 'name', 'app_id', 'permission_ehr_ids', 'ehr_id'];
     private $roleInfos = [];
 
-    public function addRoles($id, $name, $type, $menu_ehr_ids, $res_ehr_ids, $app_id = null)
+    public function addRoles($id, $name, $type, $menu_ehr_ids, $res_ehr_ids, $app_id = null, $ehr_id = null)
     {
         $this->roleInfos[] = [
             'id' => $id,
@@ -90,6 +90,7 @@ class EhrRbacRpc
             'type' => $type,
             'menu_ehr_ids' => $menu_ehr_ids,
             'res_ehr_ids' => $res_ehr_ids,
+            'ehr_id' => $ehr_id
         ];
         return sizeof($this->roleInfos);
     }
