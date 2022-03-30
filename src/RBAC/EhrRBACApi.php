@@ -31,19 +31,20 @@ class EhrRBACApi
         return true;
     }
 
-    public static function operate(&$error, JxmEhrTokenInfos $tokenInfos, $module_name, $operate, $department_id = null)
+    public static function operate(&$error, JxmEhrTokenInfos $tokenInfos, $module_name, $operate, $department_id = null, $withUpgrades = false)
     {
-        return self::canOperate($error, $tokenInfos, $module_name, $operate, config('ehr.app_id'), $department_id);
+        return self::canOperate($error, $tokenInfos, $module_name, $operate, config('ehr.app_id'), $department_id, $withUpgrades);
     }
 
     private static function canOperate(&$error, JxmEhrTokenInfos $tokenInfos, $module_name, $operate, $app_id,
-                                       $department_id = null)
+                                       $department_id = null, $withUpgrades = false)
     {
         $result = JxmEhrAccessHelper::api($error, 'rbac/rbac/canOperate', $tokenInfos, [
             'app_id' => $app_id,
             'module_names' => $module_name,
             'operate' => $operate,
             'department_id' => $department_id,
+            'withUpgrades' => $withUpgrades,
         ]);
         if ($error) return false;
         if ($result['code'] != 0) {
@@ -54,10 +55,10 @@ class EhrRBACApi
     }
 
     public static function menuUrl(&$error, JxmEhrTokenInfos $tokenInfos, $url, $app_id = null, $resource = null,
-                                   $bg_id = null, $department_id = null)
+                                   $bg_id = null, $department_id = null, $withUpgrades = false)
     {
         return self::canMenuUrl($error, $tokenInfos, $url, $app_id ?: config('ehr.app_id'),
-            $resource, $bg_id ?: config('ehr.bg_id'), $department_id);
+            $resource, $bg_id ?: config('ehr.bg_id'), $department_id, $withUpgrades);
     }
 
     /**
@@ -70,10 +71,11 @@ class EhrRBACApi
      * @param $resource
      * @param $bg_id
      * @param $department_id
+     * @param bool $withUpgrades
      * @return bool
      */
     private static function canMenuUrl(&$error, JxmEhrTokenInfos $tokenInfos, $url, $app_id, $resource,
-                                       $bg_id, $department_id)
+                                       $bg_id, $department_id, $withUpgrades = false)
     {
         $result = JxmEhrAccessHelper::api($error, 'rbac/rbac/canMenuUrl', $tokenInfos, [
             'app_id' => $app_id,
@@ -81,6 +83,7 @@ class EhrRBACApi
             'bg_id' => $bg_id,
             'resource' => $resource,
             'department_id' => $department_id,
+            'withUpgrades' => $withUpgrades,
         ]);
         if ($error) return false;
         if ($result['code'] != 0) {

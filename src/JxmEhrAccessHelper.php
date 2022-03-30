@@ -77,7 +77,6 @@ class JxmEhrAccessHelper
             }
 
             $client = new Client();
-            Log::info('params', $params);
             $response = $client->request('POST', $url, [
                 'headers' => array_merge([
                     'X-Requested-With' => 'XMLHttpRequest',
