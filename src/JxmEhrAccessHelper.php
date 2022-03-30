@@ -6,11 +6,14 @@ namespace Jxm\Ehr;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ServerException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Jxm\Ehr\Model\JxmEhrTokenInfos;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Yaf\Response\Cli;
 
 class JxmEhrAccessHelper
 {
@@ -44,9 +47,9 @@ class JxmEhrAccessHelper
      * @return array|null
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public static function api(&$error, $url, $tokenInfos, $params = [])
+    public static function api(&$error, $url, $tokenInfos, $params = [], $no_abort = false)
     {
-        return self::postApi($error, config('ehr.api') . $url, $tokenInfos, $params);
+        return self::postApi($error, config('ehr.api') . $url, $tokenInfos, $params, 'POST', null, $no_abort);
     }
 
     /**
@@ -61,7 +64,7 @@ class JxmEhrAccessHelper
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function postApi(&$error, $url, $tokenInfos, $params = [],
-                                   $method = 'POST', $app_id = null)
+                                   $method = 'POST', $app_id = null, $no_abort = false)
     {
         $response = null;
         try {
@@ -76,7 +79,7 @@ class JxmEhrAccessHelper
                 ]);
             }
 
-            $client = new Client();
+            $client = $no_abort ? (new Client(['http_errors' => false])) : (new Client());
             $response = $client->request('POST', $url, [
                 'headers' => array_merge([
                     'X-Requested-With' => 'XMLHttpRequest',
@@ -86,9 +89,12 @@ class JxmEhrAccessHelper
                 'form_params' => $params,
             ]);
             $result = json_decode($response->getBody()->getContents(), true);
+            if ($response->getStatusCode() != 200) {
+                $result['code'] = $response->getStatusCode();
+            }
             return $result;
         } catch (\Exception $exception) {
-            abort(403, $exception->getMessage());
+            abort($exception->getCode(), $exception->getMessage());
         }
     }
 

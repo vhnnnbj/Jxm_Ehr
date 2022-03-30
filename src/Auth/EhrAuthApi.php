@@ -26,28 +26,27 @@ class EhrAuthApi
 
         $client = new Client();
         $response = null;
-        try {
-            $response = JxmEhrAccessHelper::api($error, 'auth/login',
-                null, [
-                    'name' => $username,
-                    'phone' => $phone,
-                    'password' => $password,
-                    'app_id' => $app_id ?: config('ehr.app_id'),
-                ]);
-            $login_result = $response;
-
-            $token = new JxmEhrTokenInfos([
-                'token_type' => $login_result['data']['token_type'],
-                'access_token' => $login_result['data']['access_token'],
-                'refresh_token' => '',
-                'expires_at' => Carbon::parse($login_result['data']['expires_at']),
-            ]);
-            return JxmEhrAccessHelper::postApi($error, config('ehr.api') . 'auth/info',
-                $token);
-        } catch (\Exception $exception) {
-//            abort($exception->getStatusCode(), $exception->getMessage());
-            abort(403, '登录失败，账号名或者密码错误！');
+        $response = JxmEhrAccessHelper::api($error, 'auth/login',
+            null, [
+                'name' => $username,
+                'phone' => $phone,
+                'password' => $password,
+                'app_id' => $app_id ?: config('ehr.app_id'),
+            ], true);
+        $login_result = $response;
+        if ($login_result['code'] && $login_result['code'] > 200) {
+            abort(403, $login_result['message']);
         }
+        Log::info('login_res', ['res' => $login_result]);
+
+        $token = new JxmEhrTokenInfos([
+            'token_type' => $login_result['data']['token_type'],
+            'access_token' => $login_result['data']['access_token'],
+            'refresh_token' => '',
+            'expires_at' => Carbon::parse($login_result['data']['expires_at']),
+        ]);
+        return JxmEhrAccessHelper::postApi($error, config('ehr.api') . 'auth/info',
+            $token);
     }
 
     public static function checkToken(JxmEhrTokenInfos $token)
