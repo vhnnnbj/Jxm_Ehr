@@ -8,6 +8,7 @@ use Hprose\InvokeSettings;
 use Hprose\ResultMode;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
+use Jxm\Ehr\JxmEhrAccessHelper;
 
 class EhrRbacRpc
 {
@@ -117,6 +118,46 @@ class EhrRbacRpc
                 'msg' => $ex->getMessage(),
             ];
         }
+    }
+    #endregion
+
+    #region Static Functions
+    const ScopeType_Normal = 0;
+    const ScopeType_Company = 1;
+
+    public static function menuScope(&$error, $menus, $user_id, $resource = null, $bg_id = null,
+                                     $department_id = null, $withStop = true, $type = self::ScopeType_Normal)
+    {
+        $permission = JxmEhrAccessHelper::rpc('rbac', 'rbac', 'getPermissionByName', [
+            $error, $menus, config('ehr.app_id'), 1, $resource
+        ]);
+        if (!isset($permission['id'])) {
+            $error = '权限不存在,请联系技术支持处理！';
+        }
+        return self::getScopes($error, $permission['id'], $bg_id, $department_id, $withStop, $user_id);
+    }
+
+    public static function moduleScope(&$error, $modules, $user_id, $operate, $bg_id = null,
+                                       $department_id = null, $withStop = true, $type = self::ScopeType_Normal)
+    {
+        $permission = JxmEhrAccessHelper::rpc('rbac', 'rbac', 'getPermissionByName', [
+            $error, $modules, config('ehr.app_id'), 2, $operate
+        ]);
+        if (!isset($permission['id'])) {
+            $error = '权限不存在,请联系技术支持处理！';
+            return null;
+        }
+        return self::getScopes($error, $permission['id'], $bg_id, $department_id, $withStop, $user_id);
+    }
+
+    public static function getScopes(&$error, $permission, $bg_id = null,
+                                     $department_id = null, $withStop = true, $userinfo_id = null)
+    {
+        $result = JxmEhrAccessHelper::rpc('rbac', 'rbac', 'getScopes', [
+            $error, $permission, $bg_id,
+            $department_id, $withStop, $userinfo_id
+        ]);
+        return $error ? null : $result;
     }
     #endregion
 }
