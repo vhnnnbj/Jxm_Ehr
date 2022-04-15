@@ -1,29 +1,30 @@
 {
-  "name": "jxm/ehr",
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "csf",
-      "email": "chenshifang@jiuxunmu.com"
+    "name": "jxm/ehr",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "csf",
+            "email": "chenshifang@jiuxunmu.com"
+        }
+    ],
+    "require": {
+        "php": "^7.4|^8.0",
+        "hprose/hprose": "^2.0",
+        "laravel/framework": ">=6.20",
+        "ext-json": "*",
+        "guzzlehttp/guzzle": "6.*|7.*",
+        "jxm/tool": "^0.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Jxm\\Ehr\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Jxm\\Ehr\\EhrServiceProvider"
+            ]
+        }
     }
-  ],
-  "require": {
-    "php": "^7.4|^8.0",
-    "hprose/hprose": "^2.0",
-    "laravel/framework": ">=6.20",
-    "ext-json": "*",
-    "guzzlehttp/guzzle": "6.*|7.*"
-  },
-  "autoload": {
-    "psr-4": {
-      "Jxm\\Ehr\\": "src/"
-    }
-  },
-  "extra": {
-    "laravel": {
-      "providers": [
-        "Jxm\\Ehr\\EhrServiceProvider"
-      ]
-    }
-  }
 }
