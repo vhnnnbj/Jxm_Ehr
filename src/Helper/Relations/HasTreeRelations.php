@@ -22,34 +22,34 @@ trait HasTreeRelations
         throw new \Exception('need set relation query!', 500);
     }
 
-    /**
-     * Notes:获取授权关系
-     * User: harden - 2022/1/24 上午11:34
-     * @param $error
-     * @param null $operate
-     * @param null $category_id
-     * @param null $bg_id
-     * @param null $area_id
-     * @param null $department_id
-     * @param null $role_id
-     * @return Collection|LessonCategory[]|null
-     */
-    public static function getRelations(&$error, $operate = null, $category_id = null, $bg_id = null, $area_id = null,
-                                        $department_id = null, $role_id = null)
-    {
-        $relations = static::getRelationQuery()->with(['bg:id,name',
-            'area:id,name', 'department:id,name', 'role:id,name',
-            'category:id,name,parent_id']);
-        if ($operate) {
-            $relations->whereRaw('operate & ' . $operate . '!=0');
-        }
-        if ($category_id) $relations->where('category_id', $category_id);
-        if ($bg_id) $relations->where('bg_id', $bg_id);
-        if ($area_id) $relations->where('area_id', $area_id);
-        if ($department_id) $relations->where('department_id', $department_id);
-        if ($role_id) $relations->where('role_id', $role_id);
-        return $relations->get();
-    }
+//    /**
+//     * Notes:获取授权关系
+//     * User: harden - 2022/1/24 上午11:34
+//     * @param $error
+//     * @param null $operate
+//     * @param null $category_id
+//     * @param null $bg_id
+//     * @param null $area_id
+//     * @param null $department_id
+//     * @param null $role_id
+//     * @return Collection|LessonCategory[]|null
+//     */
+//    public static function getAllRelations(&$error, $operate = null, $category_id = null, $bg_id = null, $area_id = null,
+//                                           $department_id = null, $role_id = null)
+//    {
+//        $relations = static::getRelationQuery()->with(['bg:id,name',
+//            'area:id,name', 'department:id,name', 'role:id,name',
+//            'category:id,name,parent_id']);
+//        if ($operate) {
+//            $relations->whereRaw('operate & ' . $operate . '!=0');
+//        }
+//        if ($category_id) $relations->where('category_id', $category_id);
+//        if ($bg_id) $relations->where('bg_id', $bg_id);
+//        if ($area_id) $relations->where('area_id', $area_id);
+//        if ($department_id) $relations->where('department_id', $department_id);
+//        if ($role_id) $relations->where('role_id', $role_id);
+//        return $relations->get();
+//    }
 
     public static function getOwnCategories(&$error, $roleInfos, $operate, $allCats, $category_id = null)
     {
