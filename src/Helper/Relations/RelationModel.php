@@ -59,11 +59,11 @@ class RelationModel extends Model
         if (!$role_id && $operate != 0) {
             $operate = 0b000001;
         }
-        if ($operate & self::Operate_AllManage > 0) {
+        if ($operate & self::Operate_AllManage) {
             $operate = 0b001011;
-        } elseif ($operate & self::Operate_ScopeManage > 0) {
+        } elseif ($operate & self::Operate_ScopeManage) {
             $operate = 0b000111;
-        } elseif ($operate & self::Operate_Modify > 0) {
+        } elseif ($operate & self::Operate_Modify) {
             $operate = 0b000011;
         }
 

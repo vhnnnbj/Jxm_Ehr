@@ -5,6 +5,9 @@ namespace Jxm\Ehr\Helper\Relations;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
+use Jxm\Ehr\Model\Role;
 use Jxm\Tool\Helper\Tree\TreeModel;
 use Nwidart\Modules\Collection;
 
@@ -17,6 +20,35 @@ trait HasTreeRelations
     public static function getRelationQuery(): Builder
     {
         throw new \Exception('need set relation query!', 500);
+    }
+
+    /**
+     * Notes:获取授权关系
+     * User: harden - 2022/1/24 上午11:34
+     * @param $error
+     * @param null $operate
+     * @param null $category_id
+     * @param null $bg_id
+     * @param null $area_id
+     * @param null $department_id
+     * @param null $role_id
+     * @return Collection|LessonCategory[]|null
+     */
+    public static function getRelations(&$error, $operate = null, $category_id = null, $bg_id = null, $area_id = null,
+                                        $department_id = null, $role_id = null)
+    {
+        $relations = static::getRelationQuery()->with(['bg:id,name',
+            'area:id,name', 'department:id,name', 'role:id,name',
+            'category:id,name,parent_id']);
+        if ($operate) {
+            $relations->whereRaw('operate & ' . $operate . '!=0');
+        }
+        if ($category_id) $relations->where('category_id', $category_id);
+        if ($bg_id) $relations->where('bg_id', $bg_id);
+        if ($area_id) $relations->where('area_id', $area_id);
+        if ($department_id) $relations->where('department_id', $department_id);
+        if ($role_id) $relations->where('role_id', $role_id);
+        return $relations->get();
     }
 
     public static function getOwnCategories(&$error, $roleInfos, $operate, $allCats, $category_id = null)
@@ -37,6 +69,7 @@ trait HasTreeRelations
         }
 
         $allRelations = $allRelations->get();
+        Log::info('all_relation', ['all' => $allRelations]);
         $has_categories = [];
         foreach ($allRelations as $relation) {
             $matchRoles = Arr::where($roleInfos, function ($item) use ($relation) {
@@ -56,6 +89,7 @@ trait HasTreeRelations
                 }
                 return $pass;
             });
+            Log::info('match', ['all' => $matchRoles]);
             foreach ($matchRoles as $role) {
                 foreach ($relation->category->getAllChildrenIds($allCats) as $item) {
                     $sub_has = [
@@ -65,6 +99,11 @@ trait HasTreeRelations
                         'relation' => $relation,
                     ];
                     switch ($role['type']) {
+                        case Role::Type_Platform_All:
+                        case Role::Type_Platform_Normal:
+                            $sub_has['scope_type'] = 'all';
+                            $sub_has['scopes'] = '';
+                            break;
                         case Role::Type_BG_Admin:
                         case Role::Type_BG_Normal:
                             $sub_has['scope_type'] = 'bg';
@@ -98,6 +137,7 @@ trait HasTreeRelations
             }
         }
         $allOperates = [];
+        Log::info('$allOperates', ['all' => $allOperates]);
         foreach (array_unique(Arr::pluck($has_categories, 'category_id')) as $subCategory_id) {
             if ($category_id) {
                 if (!in_array($subCategory_id, $category->getAllChildrenIds($allCats)))
@@ -115,8 +155,8 @@ trait HasTreeRelations
             foreach ($operates as $subOperate) {
                 $sum = $sum | $subOperate['operate'];
                 $roles[] = $subOperate['role_id'];
-                if (($subOperate['operate'] & LessonCategoryRelation::Operate_ScopeManage)
-                    && !($subOperate['operate'] & LessonCategoryRelation::Operate_AllManage)) {
+                if (($subOperate['operate'] & RelationModel::Operate_ScopeManage)
+                    && !($subOperate['operate'] & RelationModel::Operate_AllManage)) {
                     if (sizeof(Arr::where($scopes, function ($item) use ($subOperate) {
                             return $item['scope_type'] == $subOperate['scope_type'] &&
                                 $item['scopes'] == $subOperate['scopes'];
@@ -130,7 +170,7 @@ trait HasTreeRelations
                 }
 //                $roles[] = join(',', $operate['relation']);
             }
-            if ($sum & LessonCategoryRelation::Operate_AllManage) {
+            if ($sum & RelationModel::Operate_AllManage) {
                 $scopes = [];
             }
             $item['scopes'] = $scopes;

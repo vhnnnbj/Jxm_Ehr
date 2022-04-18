@@ -19,6 +19,11 @@ class Role extends EhrBasicModel
      */
     const Type_Sys_Normal = 10;
     /**
+     * 平台角色（集团职能）
+     */
+    const Type_Platform_All = 20;
+    const Type_Platform_Normal = 25;
+    /**
      * 体系角色
      */
     const Type_BG_Admin = 40;
