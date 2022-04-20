@@ -17,6 +17,11 @@ trait HasTreeRelations
 
     abstract function relations(): HasMany;
 
+    public static function mineCategories()
+    {
+        return null;
+    }
+
     public static function getRelationQuery(): Builder
     {
         throw new \Exception('need set relation query!', 500);
@@ -71,6 +76,15 @@ trait HasTreeRelations
         $allRelations = $allRelations->get();
         Log::info('all_relation', ['all' => $allRelations]);
         $has_categories = [];
+        $own_categories = self::mineCategories();
+        foreach ($own_categories as $category) {
+            $has_categories[] = [
+                'category_id' => $category->id,
+                'role_id' => '',
+                'operate' => 11,
+                'relation' => [],
+            ];
+        }
         foreach ($allRelations as $relation) {
             $matchRoles = Arr::where($roleInfos, function ($item) use ($relation) {
                 $pass = true;
