@@ -77,14 +77,15 @@ trait HasTreeRelations
         Log::info('all_relation', ['all' => $allRelations]);
         $has_categories = [];
         $own_categories = self::mineCategories();
-        foreach ($own_categories as $category) {
-            $has_categories[] = [
-                'category_id' => $category->id,
-                'role_id' => '',
-                'operate' => 11,
-                'relation' => [],
-            ];
-        }
+        if ($own_categories)
+            foreach ($own_categories as $category) {
+                $has_categories[] = [
+                    'category_id' => $category->id,
+                    'role_id' => '',
+                    'operate' => 11,
+                    'relation' => [],
+                ];
+            }
         foreach ($allRelations as $relation) {
             $matchRoles = Arr::where($roleInfos, function ($item) use ($relation) {
                 $pass = true;
