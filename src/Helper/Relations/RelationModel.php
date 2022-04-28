@@ -60,7 +60,7 @@ class RelationModel extends Model
             $operate = 0b000001;
         }
         if ($operate & self::Operate_AllManage) {
-            $operate = 0b001011;
+            $operate = 0b001111;
         } elseif ($operate & self::Operate_ScopeManage) {
             $operate = 0b000111;
         } elseif ($operate & self::Operate_Modify) {
