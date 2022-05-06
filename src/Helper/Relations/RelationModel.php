@@ -70,7 +70,7 @@ class RelationModel extends Model
         if ($operate == 0) {
             self::where([
                 $tmp->key_model => $model_id,
-                $tmp->key_bg => $bg_id ?? '0',
+                $tmp->key_bg => $bg_id ?: '0',
                 $tmp->key_area => $area_id,
                 $tmp->key_department => $department_id,
                 $tmp->key_role => $role_id,
@@ -79,7 +79,7 @@ class RelationModel extends Model
         } else {
             $relation = self::firstOrNew([
                 $tmp->key_model => $model_id,
-                $tmp->key_bg => $bg_id ?? '0',
+                $tmp->key_bg => $bg_id ?: '0',
                 $tmp->key_area => $area_id,
                 $tmp->key_department => $department_id,
                 $tmp->key_role => $role_id,
