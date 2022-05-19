@@ -107,6 +107,48 @@ class EhrRBACApi
         }
         return true;
     }
+
+    /**
+     * Notes:
+     * User: harden - 2022/5/19 下午2:27
+     * @param $error
+     * @param JxmEhrTokenInfos $token
+     * @param string $app_id
+     * @param null $permission_id
+     * @param null $menu_names
+     * @param null $resource
+     * @param int $permission_type 0,菜单，1，模块
+     * @param null $bg_id
+     * @param null $department_id
+     * @param bool $withStop 是否带上停运部门查询
+     * @param int $type 0,正常查询，1，只查公司级别
+     * @param bool $just_id 是否只查id
+     */
+    public static function getScope(&$error, JxmEhrTokenInfos $token, $app_id, $permission_id = null, $menu_names = null, $resource = null, $permission_type = 0,
+                                    $type = 0, $just_id = false, $bg_id = null, $department_id = null, $withStop = true)
+    {
+        $result = JxmEhrAccessHelper::api($error, 'rbac/rbac/getScope', $token, array_merge([
+            'app_id' => $app_id,
+            'just_id' => $just_id,
+            'type' => $type,
+            'withStop' => $withStop,
+            'bg_id' => $bg_id,
+            'department_id' => $department_id,
+            'permission_id' => $permission_id,
+        ], ($permission_type == 0) ? [
+            'menu_names' => $menu_names,
+            'resource' => $resource,
+        ] : [
+            'module_names' => $menu_names,
+            'operate' => $resource,
+        ]));
+        if ($error) return null;
+        if ($result['code'] != 0) {
+            $error = $result['msg'];
+            return null;
+        }
+        return $result['data'];
+    }
     #endregion
 
     #region Rbac Infos
