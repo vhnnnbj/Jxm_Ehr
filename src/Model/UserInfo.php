@@ -4,6 +4,8 @@
 namespace Jxm\Ehr\Model;
 
 
+use Illuminate\Database\Eloquent\Relations\HasOne;
+
 class UserInfo extends EhrBasicModel
 {
     const State_Normal = 0;         //正常
@@ -13,4 +15,8 @@ class UserInfo extends EhrBasicModel
     const State_Exception = 30;      //异常
     const State_Unchecked = 40;      //未审核
 
+    public function archive(): HasOne
+    {
+        return $this->hasOne(ArchiveInfo::class, 'userinfo_id');
+    }
 }
