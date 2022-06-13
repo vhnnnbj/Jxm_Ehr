@@ -64,7 +64,7 @@ class JxmEhrAccessHelper
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function postApi(&$error, $url, $tokenInfos, $params = [],
-                                   $method = 'POST', $app_id = null, $no_abort = false)
+                                   $method = 'POST', $app_id = null, $no_abort = true)
     {
         $response = null;
         try {
@@ -90,6 +90,7 @@ class JxmEhrAccessHelper
             ]);
             $result = json_decode($response->getBody()->getContents(), true);
             if ($response->getStatusCode() != 200) {
+                $error = isset($result['message']) ? $result['message'] : '服务器错误';
                 $result['code'] = $response->getStatusCode();
             }
             return $result;
