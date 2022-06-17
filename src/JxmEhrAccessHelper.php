@@ -88,10 +88,18 @@ class JxmEhrAccessHelper
                 ] : []),
                 'form_params' => $params,
             ]);
-            $result = json_decode($response->getBody()->getContents(), true);
             if ($response->getStatusCode() != 200) {
-                $error = isset($result['message']) ? $result['message'] : '服务器错误';
+                $error = $response->getReasonPhrase();
                 $result['code'] = $response->getStatusCode();
+                if ($result['code'] == '401') {
+                    $error = '登录验证已过期，请重新登录!';
+                }
+                $result['message'] = $error;
+//                abort($result['code'], $result['message']);
+//                $error = isset($result['message']) ? $result['message'] : '服务器错误';
+//                $result['code'] = $response->getStatusCode();
+            } else {
+                $result = json_decode($response->getBody()->getContents(), true);
             }
             return $result;
         } catch (\Exception $exception) {
