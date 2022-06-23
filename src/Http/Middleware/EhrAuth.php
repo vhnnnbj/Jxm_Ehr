@@ -36,7 +36,8 @@ abstract class EhrAuth
             abort($result['code'], $result['message']);
         } else {
             $result = json_decode($response->getBody()->getContents(), true);
-            $user = $this->getUser($request['id']);
+            $ehr_id = $result['id'];
+            $user = $this->getUser($ehr_id);
             if (!$user) {
                 $response = $client->request('POST', config('ehr.api') . 'auth/info', [
                     'headers' => [
@@ -47,7 +48,7 @@ abstract class EhrAuth
                 $result = json_decode($response->getBody()->getContents(), true);
                 DB::beginTransaction();
                 $info = $result['data']['info'];
-                $user = $this->newUser($request['id'], $info);
+                $user = $this->newUser($ehr_id, $info);
                 DB::commit();
             }
             app('auth')->guard()->setUser($user);
