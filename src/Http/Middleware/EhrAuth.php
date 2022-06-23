@@ -2,11 +2,11 @@
 
 namespace Jxm\Ehr\Http\Middleware;
 
-use App\Models\User;
 use Closure;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Jxm\Ehr\Model\JxmEhrTokenInfos;
 
 abstract class EhrAuth
 {
@@ -52,9 +52,12 @@ abstract class EhrAuth
                 DB::commit();
             }
             app('auth')->guard()->setUser($user);
+            $this->updateToken($user, $token);
         }
         return $next($request);
     }
+
+    abstract function updateToken($user, $token);
 
     abstract function getUser($ehr_id);
 
