@@ -7,13 +7,9 @@ use Closure;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Nette\Utils\Random;
 
 abstract class EhrAuth
 {
-    private $user_ehr_key = 'ehr_id';
-
     /**
      * Handle an incoming request.
      *
@@ -40,8 +36,7 @@ abstract class EhrAuth
             abort($result['code'], $result['message']);
         } else {
             $result = json_decode($response->getBody()->getContents(), true);
-            $id = $result['id'];
-            $user = User::where($this->user_ehr_key, $id)->first();
+            $user = $this->getUser($request['id']);
             if (!$user) {
                 $response = $client->request('POST', config('ehr.api') . 'auth/info', [
                     'headers' => [
@@ -52,13 +47,15 @@ abstract class EhrAuth
                 $result = json_decode($response->getBody()->getContents(), true);
                 DB::beginTransaction();
                 $info = $result['data']['info'];
-                $user = $this->newUser($id, $info);
+                $user = $this->newUser($request['id'], $info);
                 DB::commit();
             }
             app('auth')->guard()->setUser($user);
         }
         return $next($request);
     }
+
+    abstract function getUser($ehr_id);
 
     abstract function newUser($ehr_id, $infos);
 }
