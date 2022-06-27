@@ -47,7 +47,7 @@ class JxmEhrAccessHelper
      * @return array|null
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public static function api(&$error, $url, $tokenInfos, $params = [], $no_abort = false)
+    public static function api(&$error, $url, $tokenInfos, $params = [], $no_abort = true)
     {
         return self::postApi($error, config('ehr.api') . $url, $tokenInfos, $params, 'POST', null, $no_abort);
     }
@@ -84,7 +84,7 @@ class JxmEhrAccessHelper
                 'headers' => array_merge([
                     'X-Requested-With' => 'XMLHttpRequest',
                 ], $tokenInfos ? [
-                    'Authorization' => $tokenInfos->token_type . ' ' . $tokenInfos->access_token,
+                    'Authorization' => ($tokenInfos instanceof JxmEhrTokenInfos) ? ($tokenInfos->token_type . ' ' . $tokenInfos->access_token) : $tokenInfos,
                 ] : []),
                 'form_params' => $params,
             ]);
@@ -103,7 +103,7 @@ class JxmEhrAccessHelper
             }
             return $result;
         } catch (\Exception $exception) {
-            abort($exception->getCode(), $exception->getMessage());
+            abort($exception->getCode() ?: 500, $exception->getMessage());
         }
     }
 

@@ -126,38 +126,53 @@ class EhrRbacRpc
     const ScopeType_Company = 1;
 
     public static function menuScope(&$error, $menus, $user_id, $resource = null, $bg_id = null,
-                                     $department_id = null, $withStop = true, $type = self::ScopeType_Normal)
+                                     $department_id = null, $withStop = true, $type = self::ScopeType_Normal, JxmEhrTokenInfos $tokenInfos = null)
     {
-        $permission = JxmEhrAccessHelper::rpc('rbac', 'rbac', 'getPermissionByName', [
-            $error, $menus, config('ehr.app_id'), 1, $resource
+        $permission = JxmEhrAccessHelper::api($error, 'rbac/rbac/getPermission', $tokenInfos ?: request()->header('Authorization'), [
+            'menu_names' => $menus,
+            'resource' => $resource,
+            'app_id' => config('ehr.app_id'),
+//            $error, $menus, config('ehr.app_id'), 1, $resource
         ]);
-        if (!isset($permission['id'])) {
-            $error = '权限不存在,请联系技术支持处理！';
+        if ($error) {
+            return null;
         }
+        if ($permission['code'] != 0) {
+            $error = $permission['msg'];
+            return null;
+        }
+        $permission = $permission['data']['permission'];
         return self::getScopes($error, $permission['id'], $bg_id, $department_id, $withStop, $user_id);
     }
 
     public static function moduleScope(&$error, $modules, $user_id, $operate, $bg_id = null,
-                                       $department_id = null, $withStop = true, $type = self::ScopeType_Normal)
+                                       $department_id = null, $withStop = true, $type = self::ScopeType_Normal, JxmEhrTokenInfos $tokenInfos = null)
     {
-        $permission = JxmEhrAccessHelper::rpc('rbac', 'rbac', 'getPermissionByName', [
-            $error, $modules, config('ehr.app_id'), 2, $operate
+        $permission = JxmEhrAccessHelper::api($error, 'rbac/rbac/getPermission', $tokenInfos ?: request()->header('Authorization'), [
+            'module_names' => $modules,
+            'operate' => $operate,
+            'app_id' => config('ehr.app_id'),
         ]);
-        if (!isset($permission['id'])) {
-            $error = '权限不存在,请联系技术支持处理！';
+        if ($error) {
             return null;
         }
+        if ($permission['code'] != 0) {
+            $error = $permission['msg'];
+            return null;
+        }
+        $permission = $permission['data']['permission'];
         return self::getScopes($error, $permission['id'], $bg_id, $department_id, $withStop, $user_id);
     }
 
     public static function getScopes(&$error, $permission, $bg_id = null,
-                                     $department_id = null, $withStop = true, $userinfo_id = null)
+                                     $department_id = null, $withStop = true, $userinfo_id = null, JxmEhrTokenInfos $tokenInfos = null)
     {
-        $result = JxmEhrAccessHelper::rpc('rbac', 'rbac', 'getScopes', [
-            $error, $permission, $bg_id,
-            $department_id, $withStop, $userinfo_id
+        $result = JxmEhrAccessHelper::api($error, 'rbac/rbac/getScope', $tokenInfos ?: request()->header('Authorization'), [
+            'permission_id' => $permission,
+            'app_id' => config('ehr.app_id'),
+            'just_id' => 1,
         ]);
-        return $error ? null : $result;
+        return $error ? null : $result['data']['scope'];
     }
     #endregion
 }
