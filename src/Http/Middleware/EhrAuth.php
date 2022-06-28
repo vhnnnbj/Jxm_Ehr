@@ -4,6 +4,7 @@ namespace Jxm\Ehr\Http\Middleware;
 
 use Closure;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Jxm\Ehr\Model\JxmEhrTokenInfos;
@@ -21,7 +22,10 @@ abstract class EhrAuth
     {
         $response = null;
         $token = $request->header('Authorization');
-        $params = [];
+        $track_id = random_int(1000000, 9999999);
+        $params = [
+            'api_track_msg_id' => $track_id,
+        ];
 
         $client = new Client(['http_errors' => false]);
         $response = $client->request('POST', config('ehr.api') . 'auth/getId', [
@@ -29,11 +33,19 @@ abstract class EhrAuth
                 'X-Requested-With' => 'XMLHttpRequest',
                 'Authorization' => $token,
             ],
+            'form_params' => $params,
         ]);
         if ($response->getStatusCode() != 200) {
-            $result['code'] = $response->getStatusCode();
-            $result['message'] = $response->getReasonPhrase();
-            abort($result['code'], $result['message']);
+            $response = $client->post(config('ehr.api') . 'helper/getErrorMessage', [
+                'headers' => [
+                    'X-Requested-With' => 'XMLHttpRequest',
+                ],
+                'form_params' => $params,
+            ]);
+            $result = json_decode($response->getBody()->getContents(), true);
+            $result['code'] = $result['code'] ?? 500;
+            $result['msg'] = $result['msg'] ?? '未知错误！';
+            abort($result['code'], $result['msg']);
         } else {
             $result = json_decode($response->getBody()->getContents(), true);
             $ehr_id = $result['id'];

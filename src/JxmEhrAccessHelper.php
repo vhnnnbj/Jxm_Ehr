@@ -5,14 +5,10 @@ namespace Jxm\Ehr;
 
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\ServerException;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use Jxm\Ehr\Model\JxmEhrTokenInfos;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Yaf\Response\Cli;
 
 class JxmEhrAccessHelper
@@ -67,44 +63,46 @@ class JxmEhrAccessHelper
                                    $method = 'POST', $app_id = null, $no_abort = true)
     {
         $response = null;
-        try {
-            if (!$app_id && !array_key_exists('app_id', $params)) {
-                $app_id = config('ehr.app_id', null);
-                if (!$app_id) {
-                    $error = '需要提供appid才可访问!';
-                    return null;
-                }
-                $params = array_merge($params, [
-                    'app_id' => $app_id,
-                ]);
+        if (!$app_id && !array_key_exists('app_id', $params)) {
+            $app_id = config('ehr.app_id', null);
+            if (!$app_id) {
+                $error = '需要提供appid才可访问!';
+                return null;
             }
-
-            $client = $no_abort ? (new Client(['http_errors' => false])) : (new Client());
-            $response = $client->request('POST', $url, [
-                'headers' => array_merge([
-                    'X-Requested-With' => 'XMLHttpRequest',
-                ], $tokenInfos ? [
-                    'Authorization' => ($tokenInfos instanceof JxmEhrTokenInfos) ? ($tokenInfos->token_type . ' ' . $tokenInfos->access_token) : $tokenInfos,
-                ] : []),
-                'form_params' => $params,
+            $params = array_merge($params, [
+                'app_id' => $app_id,
             ]);
-            if ($response->getStatusCode() != 200) {
-                $error = $response->getReasonPhrase();
-                $result['code'] = $response->getStatusCode();
-                if ($result['code'] == '401') {
-                    $error = '登录验证已过期，请重新登录!';
-                }
-                $result['message'] = $error;
-//                abort($result['code'], $result['message']);
-//                $error = isset($result['message']) ? $result['message'] : '服务器错误';
-//                $result['code'] = $response->getStatusCode();
-            } else {
-                $result = json_decode($response->getBody()->getContents(), true);
-            }
-            return $result;
-        } catch (\Exception $exception) {
-            abort($exception->getCode() ?: 500, $exception->getMessage());
         }
+        $params['api_track_msg_id'] = random_int(1000000, 9999999);
+
+        $client = new Client(['http_errors' => false]);
+        $response = $client->request('POST', $url, [
+            'headers' => array_merge([
+                'X-Requested-With' => 'XMLHttpRequest',
+            ], $tokenInfos ? [
+                'Authorization' => ($tokenInfos instanceof JxmEhrTokenInfos) ? ($tokenInfos->token_type . ' ' . $tokenInfos->access_token) : $tokenInfos,
+            ] : []),
+            'form_params' => $params,
+        ]);
+        if ($response->getStatusCode() != 200) {
+            $response = $client->post(config('ehr.api') . 'helper/getErrorMessage', [
+                'headers' => [
+                    'X-Requested-With' => 'XMLHttpRequest',
+                ],
+                'form_params' => Arr::only($params, 'api_track_msg_id'),
+            ]);
+            $result = json_decode($response->getBody()->getContents(), true);
+            $result['code'] = $result['code'] ?? 500;
+            $result['msg'] = $result['msg'] ?? '未知错误！';
+            $error = $result['msg'];
+            $result['message'] = $error;
+            if (!$no_abort) {
+                abort($result['code'], $result['msg']);
+            }
+        } else {
+            $result = json_decode($response->getBody()->getContents(), true);
+        }
+        return $result;
     }
 
     public static function rpc(string $module, string $class, string $method, array $args)

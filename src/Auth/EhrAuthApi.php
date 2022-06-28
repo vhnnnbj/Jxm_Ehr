@@ -32,12 +32,8 @@ class EhrAuthApi
                 'phone' => $phone,
                 'password' => $password,
                 'app_id' => $app_id ?: config('ehr.app_id'),
-            ], true);
+            ], false);
         $login_result = $response;
-        if ($login_result['code'] && $login_result['code'] > 200) {
-            abort(403, $login_result['message']);
-        }
-        Log::info('login_res', ['res' => $login_result]);
 
         $token = new JxmEhrTokenInfos([
             'token_type' => $login_result['data']['token_type'],

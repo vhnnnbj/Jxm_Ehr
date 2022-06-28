@@ -17,19 +17,19 @@ trait HasEhrTokenInfo
     public function ehr_logout()
     {
         if (!$this->ehr_token) {
-            return;
+            $token = explode(' ', request()->header('Authorization'))[1] ?? '';
         }
         $result = JxmEhrAccessHelper::postApi($error, config('ehr.api') . 'auth/logout',
-            $this->ehr_token);
+            $this->ehr_token ?: $token);
     }
 
     public function ehr_getInfo()
     {
         if (!$this->ehr_token || now()->gt($this->ehr_token->expires_at)) {
-            return null;
+            $token = explode(' ', request()->header('Authorization'))[1] ?? '';
         }
         $result = JxmEhrAccessHelper::postApi($error, config('ehr.api') . 'auth/info',
-            $this->ehr_token);
+            $this->ehr_token?:$token);
         if (!$result) {
             abort(403, $error);
         }
