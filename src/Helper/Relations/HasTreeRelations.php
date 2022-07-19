@@ -65,7 +65,8 @@ trait HasTreeRelations
 //        if ($error) return null;
 //        $allCats = self::getSimple();
         $categories = $allCats;
-        $allRelations = self::getRelationQuery()->with(['category']);
+        $allRelations = self::getRelationQuery()->with(['category'])
+            ->whereHas('category');
         if ($category_id) {
             $category = self::whereId($category_id)->first();
             $categories->whereIn('id', $category->getAllChildrenIds($allCats));
