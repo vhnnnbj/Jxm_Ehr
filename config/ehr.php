@@ -15,6 +15,9 @@ return [
      * API
      */
     'api' => env('EHR_URL') . 'api/v1/',
+    'ehr' => env('EHR_URL') . 'api/ehr/v1/',
+    'wms' => env('EHR_URL') . 'api/wms/v1/',
+    'order' => env('EHR_URL') . 'api/order/v1/',
 
     /**
      * App

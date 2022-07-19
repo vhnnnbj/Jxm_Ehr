@@ -43,7 +43,7 @@ class JxmEhrAccessHelper
      * @return array|null
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public static function api(&$error, $url, $tokenInfos, $params = [], $no_abort = true)
+    public static function api(&$error, $url, $tokenInfos, $params = [], $no_abort = false)
     {
         return self::postApi($error, config('ehr.api') . $url, $tokenInfos, $params, 'POST', null, $no_abort);
     }
@@ -60,7 +60,7 @@ class JxmEhrAccessHelper
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function postApi(&$error, $url, $tokenInfos, $params = [],
-                                   $method = 'POST', $app_id = null, $no_abort = true)
+                                   $method = 'POST', $app_id = null, $no_abort = false)
     {
         $response = null;
         if (!$app_id && !array_key_exists('app_id', $params)) {
