@@ -17,12 +17,15 @@ return [
     'api' => env('EHR_URL') . 'api/v1/',
     'ehr' => env('EHR_URL') . 'api/ehr/v1/',
     'wms' => env('EHR_URL') . 'api/wms/v1/',
-    'order' => env('EHR_URL') . 'api/order/v1/',
+    'oms' => env('EHR_URL') . 'api/oms/v1/',
 
     /**
      * App
      */
     'app' => env('EHR_URL') . 'api/a1/',
+    'ehr_app' => env('EHR_URL') . 'api/ehr/a1/',
+    'wms_app' => env('EHR_URL') . 'api/wms/a1/',
+    'oms_app' => env('EHR_URL') . 'api/oms/a1/',
 
     /**
      * OAUTH URL
