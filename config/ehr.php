@@ -18,6 +18,7 @@ return [
     'ehr' => env('EHR_URL') . 'api/ehr/v1/',
     'wms' => env('EHR_URL') . 'api/wms/v1/',
     'oms' => env('EHR_URL') . 'api/oms/v1/',
+    'esb' => env('EHR_URL') . 'api/esb/v1/',
 
     /**
      * App
