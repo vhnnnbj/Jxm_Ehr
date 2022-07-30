@@ -21,17 +21,23 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 class EhrAuthApi
 {
-    public static function login($username, $phone, $password, &$token, $app_id = null)
+    public static function login($username, $phone, $password, &$token, $app_id = null, $ip_addr = null)
     {
 
         $client = new Client();
         $response = null;
+        try {
+            $ip_addr = $ip_addr ?: request()->getClientIp();
+        } catch (\Exception $e) {
+            $ip_addr = null;
+        }
         $response = JxmEhrAccessHelper::api($error, 'auth/login',
             null, [
                 'name' => $username,
                 'phone' => $phone,
                 'password' => $password,
                 'app_id' => $app_id ?: config('ehr.app_id'),
+                'ip_address' => $ip_addr,
             ], false);
         $login_result = $response;
 
