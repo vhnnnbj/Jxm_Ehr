@@ -43,7 +43,7 @@ class JxmEsb
             'name' => $name,
             'value' => $value,
             'infos' => $infos,
-            'editor_id' => $editor ?: 0,
+            'editor_id' => $editor_id ?: 0,
         ];
         self::postApi($error, config('ehr.esb') . 'esb/set', $params);
         return $error ? false : true;
