@@ -5,8 +5,6 @@ namespace Jxm\Ehr;
 
 
 use GuzzleHttp\Client;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Log;
 
 class JxmEsb
 {
@@ -22,7 +20,7 @@ class JxmEsb
             'after' => $after ?: '2022-07-01 00:00:00',
             'except_ids' => $except_ids,
         ];
-        $reuslt = self::postApi($error, config('ehr.esb') . 'esb/get', $params);
+        $reuslt = self::postApi($error, 'esb/get', $params);
         if ($error) {
             return false;
         }
@@ -45,7 +43,7 @@ class JxmEsb
             'infos' => $infos,
             'editor_id' => $editor_id ?: 0,
         ];
-        self::postApi($error, config('ehr.esb') . 'esb/set', $params);
+        self::postApi($error, 'esb/set', $params);
         return $error ? false : true;
     }
 
