@@ -6,6 +6,7 @@ namespace Jxm\Ehr;
 
 use GuzzleHttp\Client;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 
 class JxmEsb
 {
@@ -57,15 +58,18 @@ class JxmEsb
      * @return bool
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public static function errMsg($track_id, $msg = null, $obj = null)
+    public static function errMsg($track_id, $code = null, $msg = null, $obj = null, $app_id = null)
     {
+        $url = config('ehr.esb') . 'esb/errMsg';
         $params['track_id'] = $track_id;
+        $params['app_id'] = $app_id ?: config('ehr.app_id', '');
         if ($msg) {
+            $params['code'] = $code;
             $params['msg'] = $msg;
             $params['obj'] = $obj;
         }
         $client = new Client(['http_errors' => false]);
-        $response = $client->request('POST', config('ehr.esb') . $url, [
+        $response = $client->request('POST', $url, [
             'headers' => [
                 'X-Requested-With' => 'XMLHttpRequest',
             ],
@@ -75,7 +79,8 @@ class JxmEsb
             return true;
         } else {
             if ($response->getStatusCode() == 200) {
-                $result = json_decode($response->getBody()->getContents()['err'], true);
+                $str = urldecode($response->getBody()->getContents());
+                $result = json_decode($str, true)['err'];
             } else {
                 $result = [
                     'obj' => null,
@@ -111,25 +116,7 @@ class JxmEsb
             'form_params' => $params,
         ]);
         if ($response->getStatusCode() != 200) {
-            $response = $client->post($host . 'helper/getErrorMessage', [
-                'headers' => [
-                    'X-Requested-With' => 'XMLHttpRequest',
-                ],
-                'form_params' => Arr::only($params, 'api_track_msg_id'),
-            ]);
-            if ($response->getStatusCode() != 200) {
-                $result['code'] = 500;
-                $result['msg'] = '未提供的错误信息！';
-                if (!$no_abort) {
-                    abort($result['code'], $result['msg']);
-                }
-                return $result;
-            }
-            $result = json_decode($response->getBody()->getContents(), true);
-            $result['code'] = $result['code'] ?? 500;
-            $result['msg'] = $result['msg'] ?? '未知错误！';
-            $error = $result['msg'];
-            $result['message'] = $error;
+            $result = self::errMsg($params['api_track_msg_id']);
             if (!$no_abort) {
                 abort($result['code'], $result['msg']);
             }
