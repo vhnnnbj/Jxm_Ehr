@@ -67,7 +67,7 @@ class JxmEsbJob implements ShouldQueue
                 $after = Carbon::parse($msg['created_at'])->gt($after) ? $msg['created_at'] : $after;
                 $record = EsbMessageRecord::makeRecord(1, '获取ESB消息', 0, $msg, '', $msg['editor_id'] ?? null,
                     null, $msg['value'], now());
-                $this->deal($msg);
+                $this->deal($msg, $record);
             }
         } while (sizeof($gets) > 0);
         Redis::setex(self::Key_Prefix, 30 * 60, json_encode([
@@ -76,5 +76,5 @@ class JxmEsbJob implements ShouldQueue
         ]));
     }
 
-    abstract function deal(array $msg): bool;
+    abstract function deal(array $msg, EsbMessageRecord $record): bool;
 }
