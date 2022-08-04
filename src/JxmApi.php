@@ -5,7 +5,6 @@ namespace Jxm\Ehr;
 
 
 use GuzzleHttp\Client;
-use Illuminate\Support\Arr;
 use Jxm\Ehr\Model\JxmEhrTokenInfos;
 
 class JxmApi
@@ -128,25 +127,8 @@ class JxmApi
             'form_params' => $params,
         ]);
         if ($response->getStatusCode() != 200) {
-            $response = $client->post($host . 'helper/getErrorMessage', [
-                'headers' => [
-                    'X-Requested-With' => 'XMLHttpRequest',
-                ],
-                'form_params' => Arr::only($params, 'api_track_msg_id'),
-            ]);
-            if ($response->getStatusCode() != 200) {
-                $result['code'] = 500;
-                $result['msg'] = '未提供的错误信息！';
-                if (!$no_abort) {
-                    abort($result['code'], $result['msg']);
-                }
-                return $result;
-            }
-            $result = json_decode($response->getBody()->getContents(), true);
-            $result['code'] = $result['code'] ?? 500;
-            $result['msg'] = $result['msg'] ?? '未知错误！';
+            $result = JxmEsb::errMsg($params['api_track_msg_id']);
             $error = $result['msg'];
-            $result['message'] = $error;
             if (!$no_abort) {
                 abort($result['code'], $result['msg']);
             }
