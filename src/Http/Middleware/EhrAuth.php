@@ -7,6 +7,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Jxm\Ehr\JxmEsb;
 use Jxm\Ehr\Model\JxmEhrTokenInfos;
 
 abstract class EhrAuth
@@ -36,15 +37,7 @@ abstract class EhrAuth
             'form_params' => $params,
         ]);
         if ($response->getStatusCode() != 200) {
-            $response = $client->post(config('ehr.api') . 'helper/getErrorMessage', [
-                'headers' => [
-                    'X-Requested-With' => 'XMLHttpRequest',
-                ],
-                'form_params' => $params,
-            ]);
-            $result = json_decode($response->getBody()->getContents(), true);
-            $result['code'] = $result['code'] ?? 500;
-            $result['msg'] = $result['msg'] ?? '未知错误！';
+            $result = JxmEsb::errMsg($params['api_track_msg_id']);
             abort($result['code'], $result['msg']);
         } else {
             $result = json_decode($response->getBody()->getContents(), true);
