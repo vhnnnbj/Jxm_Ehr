@@ -25,7 +25,7 @@ class JxmApp
                                $app_id = null, $no_abort = false)
     {
         $host = config('ehr.app');
-        return self::postApi($error, $host, $url, $params, 'POST', $app_id, $no_abort);
+        return self::postApp($error, $host, $url, $params, 'POST', $app_id, $no_abort);
     }
 
     /**
@@ -44,7 +44,7 @@ class JxmApp
                                $app_id = null, $no_abort = false)
     {
         $host = config('ehr.wms_app');
-        return self::postApi($error, $host, $url, $params, 'POST', $app_id, $no_abort);
+        return self::postApp($error, $host, $url, $params, 'POST', $app_id, $no_abort);
     }
 
     /**
@@ -63,7 +63,7 @@ class JxmApp
                                $app_id = null, $no_abort = false)
     {
         $host = config('ehr.ehr_app');
-        return self::postApi($error, $host, $url, $params, 'POST', $app_id, $no_abort);
+        return self::postApp($error, $host, $url, $params, 'POST', $app_id, $no_abort);
     }
 
     /**
@@ -82,7 +82,7 @@ class JxmApp
                                  $app_id = null, $no_abort = false)
     {
         $host = config('ehr.oms_app');
-        return self::postApi($error, $host, $url, $params, 'POST', $app_id, $no_abort);
+        return self::postApp($error, $host, $url, $params, 'POST', $app_id, $no_abort);
     }
 
     /**

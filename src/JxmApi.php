@@ -6,6 +6,7 @@ namespace Jxm\Ehr;
 
 use GuzzleHttp\Client;
 use Illuminate\Support\Arr;
+use Jxm\Ehr\Model\JxmEhrTokenInfos;
 
 class JxmApi
 {
@@ -79,7 +80,7 @@ class JxmApi
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function order(&$error, $url, $params = [], $tokenInfos = null,
-                               $app_id = null, $no_abort = false)
+                                 $app_id = null, $no_abort = false)
     {
         $host = config('ehr.oms');
         return self::postApi($error, $host, $url, $params, $tokenInfos, 'POST', $app_id, $no_abort);
@@ -113,13 +114,16 @@ class JxmApi
         $params['api_track_msg_id'] = random_int(1000000, 9999999);
 
         $client = new Client(['http_errors' => false]);
+        if ($tokenInfos == null) {
+            $tokenInfos = request()->header('Authorization');
+        } elseif ($tokenInfos instanceof JxmEhrTokenInfos) {
+            $tokenInfos = $tokenInfos->token_type . ' ' . $tokenInfos->access_token;
+        }
         $response = $client->request('POST', $host . $url, [
             'headers' => array_merge([
                 'X-Requested-With' => 'XMLHttpRequest',
             ], $tokenInfos ? [
-                'Authorization' => ($tokenInfos instanceof JxmEhrTokenInfos) ?
-                    ($tokenInfos->token_type . ' ' . $tokenInfos->access_token) :
-                    $tokenInfos,
+                'Authorization' => $tokenInfos,
             ] : []),
             'form_params' => $params,
         ]);
