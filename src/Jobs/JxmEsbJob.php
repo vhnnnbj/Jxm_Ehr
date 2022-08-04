@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Redis;
 use Jxm\Ehr\JxmEsb;
 use Jxm\Ehr\Model\EsbMessageRecord;
 
-class JxmEsbJob implements ShouldQueue
+abstract class JxmEsbJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
