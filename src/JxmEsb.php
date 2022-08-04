@@ -97,7 +97,6 @@ class JxmEsb
     public static function postApi(&$error, $url, $params = [],
                                    $method = 'POST', $app_id = null, $no_abort = false)
     {
-        $response = null;
         if (!$app_id && !array_key_exists('app_id', $params)) {
             $app_id = config('ehr.app_id', null);
             if (!$app_id) {
