@@ -78,7 +78,11 @@ class JxmEsb
         } else {
             if ($response->getStatusCode() == 200) {
                 $str = urldecode($response->getBody()->getContents());
-                $result = json_decode($str, true)['err'];
+                $result = json_decode($str, true)['err'] ?: [
+                    'obj' => null,
+                    'msg' => '未知的错误信息！',
+                    'code' => 500,
+                ];
             } else {
                 $result = [
                     'obj' => null,
