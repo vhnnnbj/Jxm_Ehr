@@ -4,10 +4,9 @@ namespace Jxm\Ehr\Http\Middleware;
 
 use Closure;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Jxm\Ehr\Model\JxmEhrTokenInfos;
+use Illuminate\Support\Facades\Redis;
 
 abstract class EhrAuth
 {
@@ -70,7 +69,7 @@ abstract class EhrAuth
                 DB::commit();
             }
             app('auth')->guard()->setUser($user);
-            $this->cacheUser($token, $user);
+            $this->cacheUser($token, $ehr_id);
             $this->updateToken($user, $token);
         }
         return $next($request);
@@ -78,10 +77,15 @@ abstract class EhrAuth
 
     function getCache($authorization)
     {
-        return null;
+        $ehr_id = Redis::get('Authorization:' . $authorization);
+        if (!$ehr_id) return null;
+        return $this->getUser($ehr_id);
     }
 
-    abstract function cacheUser($authorization, $user);
+    function cacheUser($authorization, $ehr_id)
+    {
+        Redis::setex('Authorization:' . $authorization, 60, $ehr_id);
+    }
 
     abstract function updateToken($user, $token);
 
