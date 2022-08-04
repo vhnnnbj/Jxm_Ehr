@@ -7,7 +7,6 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Jxm\Ehr\JxmEsb;
 use Jxm\Ehr\Model\JxmEhrTokenInfos;
 
 abstract class EhrAuth
@@ -23,6 +22,12 @@ abstract class EhrAuth
     {
         $response = null;
         $token = $request->header('Authorization');
+        $jwt = \trim((string)\preg_replace('/^\s*Bearer\s/', '', $token));
+        $user = $this->getCache($token);
+        if ($user) {
+            app('auth')->guard()->setUser($user);
+            return $next($request);
+        }
         $track_id = random_int(1000000, 9999999);
         $params = [
             'api_track_msg_id' => $track_id,
@@ -37,7 +42,15 @@ abstract class EhrAuth
             'form_params' => $params,
         ]);
         if ($response->getStatusCode() != 200) {
-            $result = JxmEsb::errMsg($params['api_track_msg_id']);
+            $response = $client->post(config('ehr.api') . 'helper/getErrorMessage', [
+                'headers' => [
+                    'X-Requested-With' => 'XMLHttpRequest',
+                ],
+                'form_params' => $params,
+            ]);
+            $result = json_decode($response->getBody()->getContents(), true);
+            $result['code'] = $result['code'] ?? 500;
+            $result['msg'] = $result['msg'] ?? '未知错误！';
             abort($result['code'], $result['msg']);
         } else {
             $result = json_decode($response->getBody()->getContents(), true);
@@ -57,10 +70,18 @@ abstract class EhrAuth
                 DB::commit();
             }
             app('auth')->guard()->setUser($user);
+            $this->cacheUser($token, $user);
             $this->updateToken($user, $token);
         }
         return $next($request);
     }
+
+    function getCache($authorization)
+    {
+        return null;
+    }
+
+    abstract function cacheUser($authorization, $user);
 
     abstract function updateToken($user, $token);
 
