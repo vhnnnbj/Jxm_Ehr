@@ -24,7 +24,7 @@ class JxmEsb
         if ($error) {
             return false;
         }
-        return $result['msgs'];
+        return $result['msgs'] ?? [];
     }
 
     public static function set(&$error, $name, $value, $route = null,
