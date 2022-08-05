@@ -78,7 +78,7 @@ class JxmApi
      * @return array|null
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public static function order(&$error, $url, $params = [], $tokenInfos = null,
+    public static function oms(&$error, $url, $params = [], $tokenInfos = null,
                                  $app_id = null, $no_abort = false)
     {
         $host = config('ehr.oms');
