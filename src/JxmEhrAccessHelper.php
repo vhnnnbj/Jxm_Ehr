@@ -74,6 +74,9 @@ class JxmEhrAccessHelper
             ]);
         }
         $params['api_track_msg_id'] = random_int(1000000, 9999999);
+        if (!$tokenInfos) {
+            $tokenInfos = request()?->header('Authorization');
+        }
 
         $client = new Client(['http_errors' => false]);
         $response = $client->request('POST', $url, [
