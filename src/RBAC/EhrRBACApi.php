@@ -23,7 +23,6 @@ class EhrRBACApi
             'resource' => $resource,
             'department_id' => $department_id,
         ]);
-        if ($error) return false;
         if ($result['code'] != 0) {
             $error = $result['msg'];
             return false;
@@ -46,7 +45,6 @@ class EhrRBACApi
             'department_id' => $department_id,
             'withUpgrades' => $withUpgrades,
         ]);
-        if ($error) return false;
         if ($result['code'] != 0) {
             $error = $result['msg'];
             return false;
