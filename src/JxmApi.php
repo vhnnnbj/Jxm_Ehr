@@ -79,7 +79,7 @@ class JxmApi
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function oms(&$error, $url, $params = [], $tokenInfos = null,
-                                 $app_id = null, $no_abort = false)
+                               $app_id = null, $no_abort = false)
     {
         $host = config('ehr.oms');
         return self::postApi($error, $host, $url, $params, $tokenInfos, 'POST', $app_id, $no_abort);
@@ -134,6 +134,9 @@ class JxmApi
             }
         } else {
             $result = json_decode($response->getBody()->getContents(), true);
+            if ($result['code'] != 0) {
+                $error = makeErrorMsg($result['msg'], $result['code']);
+            }
         }
         return $result;
     }

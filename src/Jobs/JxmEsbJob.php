@@ -53,6 +53,9 @@ abstract class JxmEsbJob implements ShouldQueue
                 $except_ids = '';
             }
         }
+        if (now()->diffInSeconds($after, true) < 20) {
+            return;
+        }
         $excepts = explode(',', $except_ids);
         do {
             $gets = JxmEsb::get($after, join(',', $excepts));
