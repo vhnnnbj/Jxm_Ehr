@@ -119,13 +119,12 @@ class JxmApi
         } elseif ($tokenInfos instanceof JxmEhrTokenInfos) {
             $tokenInfos = $tokenInfos->token_type . ' ' . $tokenInfos->access_token;
         }
-        $transact_request = request()->header('rt_request_id') ?: session_create_id();
         $transact_id = RT::getTransactId();
         $response = $client->request('POST', $host . $url, [
             'headers' => array_merge([
                 'X-Requested-With' => 'XMLHttpRequest',
             ], $transact_id ? [
-                'rt_request_id' => $transact_request,
+                'rt_request_id' => request()->header('rt_request_id') ?: session_create_id(),
                 'rt_transact_id' => $transact_id,
             ] : [], $tokenInfos ? [
                 'Authorization' => $tokenInfos,
