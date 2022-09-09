@@ -5,6 +5,7 @@ namespace Jxm\Ehr;
 
 
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Log;
 use Jxm\Ehr\Model\JxmEhrTokenInfos;
 use Laravel\ResetTransaction\Facades\RT;
 
@@ -87,6 +88,25 @@ class JxmApi
     }
 
     /**
+     * Notes: ESB
+     * User: harden - 2022/7/11 上午10:33
+     * @param $error
+     * @param $url
+     * @param array $params
+     * @param null $tokenInfos
+     * @param null $app_id
+     * @param false $no_abort
+     * @return array|null
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public static function esb(&$error, $url, $params = [], $tokenInfos = null,
+                               $app_id = null, $no_abort = false)
+    {
+        $host = config('ehr.esb');
+        return self::postApi($error, $host, $url, $params, $tokenInfos, 'POST', $app_id, $no_abort);
+    }
+
+    /**
      * Notes: api访问
      * User: harden - 2021/11/19 上午9:51
      * @param string $error
@@ -122,6 +142,7 @@ class JxmApi
         $transact_id = null;
         try {
             $transact_id = RT::getTransactId();
+            Log::info('transact_id: ' . $transact_id);
         } catch (Exception $e) {
             ;
         }
@@ -140,6 +161,9 @@ class JxmApi
             $result = JxmEsb::errMsg($params['api_track_msg_id']);
             $error = $result['msg'];
             if (!$no_abort) {
+                if ($transact_id) {
+                    RT::rollBack();
+                }
                 abort($result['code'], $result['msg']);
             }
         } else {
