@@ -164,12 +164,12 @@ class JxmApi
                 if ($transact_id) {
                     RT::rollBack();
                 }
-                abort($result['code'], $result['msg']);
+                abort($result['code'] ?? 500, $result['msg'] ?? '');
             }
         } else {
             $result = json_decode($response->getBody()->getContents(), true);
-            if ($result['code'] != 0) {
-                $error = makeErrorMsg($result['msg'], $result['code']);
+            if (isset($result['code']) && $result['code'] != 0) {
+                $error = makeErrorMsg($result['msg'] ?? '', $result['code']);
             }
         }
         return $result;
