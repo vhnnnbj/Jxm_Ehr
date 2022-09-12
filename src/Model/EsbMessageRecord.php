@@ -52,6 +52,11 @@ class EsbMessageRecord extends Model
 
     protected $fillable = RecordFillable;
 
+    const State_Normal = 0;         //正常
+    const State_Done = 50;          //执行完毕
+    const State_Error = 80;          //执行失败
+    const State_Exception = 110; //执行异常
+
     public function editor(): BelongsTo
     {
         return $this->belongsTo(UserInfo::class)
