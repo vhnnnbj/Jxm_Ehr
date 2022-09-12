@@ -7,7 +7,7 @@ namespace Jxm\Ehr;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
 use Jxm\Ehr\Model\JxmEhrTokenInfos;
-use Laravel\ResetTransaction\Facades\RT;
+//use Laravel\ResetTransaction\Facades\RT;
 
 class JxmApi
 {
@@ -140,12 +140,12 @@ class JxmApi
             $tokenInfos = $tokenInfos->token_type . ' ' . $tokenInfos->access_token;
         }
         $transact_id = null;
-        try {
-            $transact_id = RT::getTransactId();
-            Log::info('transact_id: ' . $transact_id);
-        } catch (Exception $e) {
-            ;
-        }
+//        try {
+//            $transact_id = RT::getTransactId();
+//            Log::info('transact_id: ' . $transact_id);
+//        } catch (Exception $e) {
+//            ;
+//        }
         $response = $client->request('POST', $host . $url, [
             'headers' => array_merge([
                 'X-Requested-With' => 'XMLHttpRequest',
@@ -161,9 +161,9 @@ class JxmApi
             $result = JxmEsb::errMsg($params['api_track_msg_id']);
             $error = $result['msg'];
             if (!$no_abort) {
-                if ($transact_id) {
-                    RT::rollBack();
-                }
+//                if ($transact_id) {
+//                    RT::rollBack();
+//                }
                 abort($result['code'] ?? 500, $result['msg'] ?? '');
             }
         } else {
