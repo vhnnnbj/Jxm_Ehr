@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up()
     {
-        Schema::create('esb_message_record', function (Blueprint $table) {
+        Schema::create('esb_message_records', function (Blueprint $table) {
             $table->id();
             formatRecordTableColumn($table);
             $table->timestamps();
@@ -16,6 +16,6 @@ return new class extends Migration {
 
     public function down()
     {
-        Schema::dropIfExists('esb_message_record');
+        Schema::dropIfExists('esb_message_records');
     }
 };
