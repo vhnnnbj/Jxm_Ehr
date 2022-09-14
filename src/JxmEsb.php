@@ -5,9 +5,27 @@ namespace Jxm\Ehr;
 
 
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class JxmEsb
 {
+    public static function msg($name, $value, $route = null, $infos = null, $app_id = null, $editor_id = null)
+    {
+        if (is_array($infos))
+            $infos = json_encode($infos, JSON_UNESCAPED_UNICODE);
+        JxmApi::esb($error, 'msg/post', [
+            'name' => $name,
+            'value' => $value,
+            'route' => $route,
+            'infos' => $infos,
+            'editor_id' => $editor_id ?: Auth::user()?->ehr_id,
+        ], null, $app_id, true);
+        if ($error) {
+            Log::error('esb error:' . $error);
+        }
+    }
+
     public static function get($after = null, $except_ids = null)
     {
         $app_id = config('ehr.app_id', '');
