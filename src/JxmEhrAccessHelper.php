@@ -121,8 +121,7 @@ class JxmEhrAccessHelper
     {
         $conn = Cache::get('ehr.data.connection.config', null);
         if (!$conn) {
-            $token = JxmEhrTokenInfos::where('user_id', Auth::user()->id)->first();
-            $result = JxmEhrAccessHelper::api($error, 'helper/dataConn', $token);
+            $result = JxmApp::iam($error, 'helper/dataConn');
             if ($error) {
                 abort(403);
             }
