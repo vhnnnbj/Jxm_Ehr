@@ -6,6 +6,7 @@ namespace Jxm\Ehr;
 
 use GuzzleHttp\Client;
 use Jxm\Ehr\Model\JxmEhrTokenInfos;
+use Laravel\ResetTransaction\Facades\RT;
 
 //use Laravel\ResetTransaction\Facades\RT;
 
@@ -138,6 +139,9 @@ class JxmApi
             $tokenInfos = request()->header('Authorization');
         } elseif ($tokenInfos instanceof JxmEhrTokenInfos) {
             $tokenInfos = $tokenInfos->token_type . ' ' . $tokenInfos->access_token;
+        }
+        if (!$rt_id) {
+            $rt_id = RT::getTransactId();
         }
         $response = $client->request('POST', $host . $url, [
             'headers' => array_merge([
