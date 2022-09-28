@@ -147,8 +147,8 @@ class JxmApi
             'headers' => array_merge([
                 'X-Requested-With' => 'XMLHttpRequest',
             ], $rt_id ? [
-                'rt_request_id' => session_create_id(),
-                'rt_transact_id' => $rt_id,
+                'rt-request-id' => session_create_id(),
+                'rt-transact-id' => $rt_id,
             ] : [], $tokenInfos ? [
                 'Authorization' => $tokenInfos,
             ] : []),

@@ -117,8 +117,8 @@ class JxmApp
             'headers' => array_merge([
                 'X-Requested-With' => 'XMLHttpRequest',
             ], $rt_id ? [
-                'rt_request_id' => session_create_id(),
-                'rt_transact_id' => $transact_id,
+                'rt-request-id' => session_create_id(),
+                'rt-transact-id' => $transact_id,
             ] : []),
             'form_params' => $params,
         ]);
