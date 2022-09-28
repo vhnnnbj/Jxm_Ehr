@@ -5,8 +5,8 @@ namespace Jxm\Ehr;
 
 
 use GuzzleHttp\Client;
-use Illuminate\Support\Facades\Log;
 use Jxm\Ehr\Model\JxmEhrTokenInfos;
+
 //use Laravel\ResetTransaction\Facades\RT;
 
 class JxmApi
@@ -24,10 +24,10 @@ class JxmApi
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function iam(&$error, $url, $params = [], $tokenInfos = null,
-                               $app_id = null, $no_abort = false)
+                               $app_id = null, $no_abort = false, $rt_id = null)
     {
         $host = config('ehr.api');
-        return self::postApi($error, $host, $url, $params, $tokenInfos, 'POST', $app_id, $no_abort);
+        return self::postApi($error, $host, $url, $params, $tokenInfos, 'POST', $app_id, $no_abort, $rt_id);
     }
 
     /**
@@ -43,10 +43,10 @@ class JxmApi
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function wms(&$error, $url, $params = [], $tokenInfos = null,
-                               $app_id = null, $no_abort = false)
+                               $app_id = null, $no_abort = false, $rt_id = null)
     {
         $host = config('ehr.wms');
-        return self::postApi($error, $host, $url, $params, $tokenInfos, 'POST', $app_id, $no_abort);
+        return self::postApi($error, $host, $url, $params, $tokenInfos, 'POST', $app_id, $no_abort, $rt_id);
     }
 
     /**
@@ -62,10 +62,10 @@ class JxmApi
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function ehr(&$error, $url, $params = [], $tokenInfos = null,
-                               $app_id = null, $no_abort = false)
+                               $app_id = null, $no_abort = false, $rt_id = null)
     {
         $host = config('ehr.ehr');
-        return self::postApi($error, $host, $url, $params, $tokenInfos, 'POST', $app_id, $no_abort);
+        return self::postApi($error, $host, $url, $params, $tokenInfos, 'POST', $app_id, $no_abort, $rt_id);
     }
 
     /**
@@ -81,10 +81,10 @@ class JxmApi
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function oms(&$error, $url, $params = [], $tokenInfos = null,
-                               $app_id = null, $no_abort = false)
+                               $app_id = null, $no_abort = false, $rt_id = null)
     {
         $host = config('ehr.oms');
-        return self::postApi($error, $host, $url, $params, $tokenInfos, 'POST', $app_id, $no_abort);
+        return self::postApi($error, $host, $url, $params, $tokenInfos, 'POST', $app_id, $no_abort, $rt_id);
     }
 
     /**
@@ -100,10 +100,10 @@ class JxmApi
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function esb(&$error, $url, $params = [], $tokenInfos = null,
-                               $app_id = null, $no_abort = false)
+                               $app_id = null, $no_abort = false, $rt_id = null)
     {
         $host = config('ehr.esb');
-        return self::postApi($error, $host, $url, $params, $tokenInfos, 'POST', $app_id, $no_abort);
+        return self::postApi($error, $host, $url, $params, $tokenInfos, 'POST', $app_id, $no_abort, $rt_id);
     }
 
     /**
@@ -118,7 +118,7 @@ class JxmApi
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function postApi(&$error, $host, $url, $params = [], $tokenInfos = null,
-                                   $method = 'POST', $app_id = null, $no_abort = false)
+                                   $method = 'POST', $app_id = null, $no_abort = false, $rt_id = null)
     {
         $response = null;
         if (!$app_id && !array_key_exists('app_id', $params)) {
@@ -139,19 +139,12 @@ class JxmApi
         } elseif ($tokenInfos instanceof JxmEhrTokenInfos) {
             $tokenInfos = $tokenInfos->token_type . ' ' . $tokenInfos->access_token;
         }
-        $transact_id = null;
-//        try {
-//            $transact_id = RT::getTransactId();
-//            Log::info('transact_id: ' . $transact_id);
-//        } catch (Exception $e) {
-//            ;
-//        }
         $response = $client->request('POST', $host . $url, [
             'headers' => array_merge([
                 'X-Requested-With' => 'XMLHttpRequest',
-            ], $transact_id ? [
+            ], $rt_id ? [
                 'rt_request_id' => session_create_id(),
-                'rt_transact_id' => $transact_id,
+                'rt_transact_id' => $rt_id,
             ] : [], $tokenInfos ? [
                 'Authorization' => $tokenInfos,
             ] : []),
@@ -161,9 +154,6 @@ class JxmApi
             $result = JxmEsb::errMsg($params['api_track_msg_id']);
             $error = $result['msg'];
             if (!$no_abort) {
-//                if ($transact_id) {
-//                    RT::rollBack();
-//                }
                 abort($result['code'] ?? 500, $result['msg'] ?? '');
             }
         } else {

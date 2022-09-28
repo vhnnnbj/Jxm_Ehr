@@ -22,10 +22,10 @@ class JxmApp
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function iam(&$error, $url, $params = [],
-                               $app_id = null, $no_abort = false)
+                               $app_id = null, $no_abort = false, $rt_id = null)
     {
         $host = config('ehr.app');
-        return self::postApp($error, $host, $url, $params, 'POST', $app_id, $no_abort);
+        return self::postApp($error, $host, $url, $params, 'POST', $app_id, $no_abort, $rt_id);
     }
 
     /**
@@ -41,10 +41,10 @@ class JxmApp
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function wms(&$error, $url, $params = [],
-                               $app_id = null, $no_abort = false)
+                               $app_id = null, $no_abort = false, $rt_id = null)
     {
         $host = config('ehr.wms_app');
-        return self::postApp($error, $host, $url, $params, 'POST', $app_id, $no_abort);
+        return self::postApp($error, $host, $url, $params, 'POST', $app_id, $no_abort, $rt_id);
     }
 
     /**
@@ -60,10 +60,10 @@ class JxmApp
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function ehr(&$error, $url, $params = [],
-                               $app_id = null, $no_abort = false)
+                               $app_id = null, $no_abort = false, $rt_id = null)
     {
         $host = config('ehr.ehr_app');
-        return self::postApp($error, $host, $url, $params, 'POST', $app_id, $no_abort);
+        return self::postApp($error, $host, $url, $params, 'POST', $app_id, $no_abort, $rt_id);
     }
 
     /**
@@ -79,10 +79,10 @@ class JxmApp
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function oms(&$error, $url, $params = [],
-                                 $app_id = null, $no_abort = false)
+                               $app_id = null, $no_abort = false, $rt_id = null)
     {
         $host = config('ehr.oms_app');
-        return self::postApp($error, $host, $url, $params, 'POST', $app_id, $no_abort);
+        return self::postApp($error, $host, $url, $params, 'POST', $app_id, $no_abort . $rt_id);
     }
 
     /**
@@ -97,7 +97,7 @@ class JxmApp
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function postApp(&$error, $host, $url, $params = [],
-                                   $method = 'POST', $app_id = null, $no_abort = false)
+                                   $method = 'POST', $app_id = null, $no_abort = false, $rt_id = null)
     {
         $response = null;
         if (!$app_id && !array_key_exists('app_id', $params)) {
@@ -114,9 +114,12 @@ class JxmApp
 
         $client = new Client(['http_errors' => false]);
         $response = $client->request('POST', $host . $url, [
-            'headers' => [
+            'headers' => array_merge([
                 'X-Requested-With' => 'XMLHttpRequest',
-            ],
+            ], $rt_id ? [
+                'rt_request_id' => session_create_id(),
+                'rt_transact_id' => $transact_id,
+            ] : []),
             'form_params' => $params,
         ]);
         if ($response->getStatusCode() != 200) {
