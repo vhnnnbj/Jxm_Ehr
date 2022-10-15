@@ -5,11 +5,13 @@ namespace Jxm\Ehr\Model;
 
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 use Jxm\Ehr\JxmEhrAccessHelper;
 
 class EhrBasicModel extends Model
 {
+    use SoftDeletes;
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
