@@ -10,12 +10,12 @@ use Jxm\Ehr\Model\JxmEhrTokenInfos;
 class EhrRBACApi
 {
     #region Check Permissions
-    public static function menu(&$error, JxmEhrTokenInfos $tokenInfos, $menu_name, $department_id = 0, $resource = null)
+    public static function menu(&$error, JxmEhrTokenInfos|null $tokenInfos, $menu_name, $department_id = 0, $resource = null)
     {
         return self::canMenu($error, $tokenInfos, $menu_name, config('ehr.app_id'), $department_id, $resource);
     }
 
-    private static function canMenu(&$error, JxmEhrTokenInfos $tokenInfos, $menu_name, $app_id = 0, $department_id = 0, $resource = null)
+    private static function canMenu(&$error, JxmEhrTokenInfos|null $tokenInfos, $menu_name, $app_id = 0, $department_id = 0, $resource = null)
     {
         $result = JxmEhrAccessHelper::api($error, 'rbac/rbac/canMenu', $tokenInfos, [
             'app_id' => $app_id,
@@ -30,12 +30,12 @@ class EhrRBACApi
         return true;
     }
 
-    public static function operate(&$error, JxmEhrTokenInfos $tokenInfos, $module_name, $operate, $department_id = null, $withUpgrades = false)
+    public static function operate(&$error, JxmEhrTokenInfos|null $tokenInfos, $module_name, $operate, $department_id = null, $withUpgrades = false)
     {
         return self::canOperate($error, $tokenInfos, $module_name, $operate, config('ehr.app_id'), $department_id, $withUpgrades);
     }
 
-    private static function canOperate(&$error, JxmEhrTokenInfos $tokenInfos, $module_name, $operate, $app_id,
+    private static function canOperate(&$error, JxmEhrTokenInfos|null $tokenInfos, $module_name, $operate, $app_id,
                                        $department_id = null, $withUpgrades = false)
     {
         $result = JxmEhrAccessHelper::api($error, 'rbac/rbac/canOperate', $tokenInfos, [
@@ -52,7 +52,7 @@ class EhrRBACApi
         return true;
     }
 
-    public static function menuUrl(&$error, JxmEhrTokenInfos $tokenInfos, $url, $app_id = null, $resource = null,
+    public static function menuUrl(&$error, JxmEhrTokenInfos|null $tokenInfos, $url, $app_id = null, $resource = null,
                                    $bg_id = null, $department_id = null, $withUpgrades = false)
     {
         return self::canMenuUrl($error, $tokenInfos, $url, $app_id ?: config('ehr.app_id'),
@@ -72,7 +72,7 @@ class EhrRBACApi
      * @param bool $withUpgrades
      * @return bool
      */
-    private static function canMenuUrl(&$error, JxmEhrTokenInfos $tokenInfos, $url, $app_id, $resource,
+    private static function canMenuUrl(&$error, JxmEhrTokenInfos|null $tokenInfos, $url, $app_id, $resource,
                                        $bg_id, $department_id, $withUpgrades = false)
     {
         $result = JxmEhrAccessHelper::api($error, 'rbac/rbac/canMenuUrl', $tokenInfos, [
@@ -91,7 +91,7 @@ class EhrRBACApi
         return true;
     }
 
-    public static function can(&$error, JxmEhrTokenInfos $tokenInfos, $permission_id, $bg_id = null, $department_id = null)
+    public static function can(&$error, JxmEhrTokenInfos|null $tokenInfos, $permission_id, $bg_id = null, $department_id = null)
     {
         $result = JxmEhrAccessHelper::api($error, 'rbac/rbac/can', $tokenInfos, [
             'bg_id' => $bg_id ?: config('ehr.bg_id'),
@@ -122,7 +122,7 @@ class EhrRBACApi
      * @param int $type 0,正常查询，1，只查公司级别
      * @param bool $just_id 是否只查id
      */
-    public static function getScope(&$error, JxmEhrTokenInfos $token, $app_id, $permission_id = null, $menu_names = null, $resource = null, $permission_type = 0,
+    public static function getScope(&$error, JxmEhrTokenInfos|null $token, $app_id, $permission_id = null, $menu_names = null, $resource = null, $permission_type = 0,
                                     $type = 0, $just_id = false, $bg_id = null, $department_id = null, $withStop = true)
     {
         $result = JxmEhrAccessHelper::api($error, 'rbac/rbac/getScope', $token, array_merge([
@@ -150,7 +150,7 @@ class EhrRBACApi
     #endregion
 
     #region Rbac Infos
-    public static function ownRoles(&$error, JxmEhrTokenInfos $tokenInfos, $bg_id = null)
+    public static function ownRoles(&$error, JxmEhrTokenInfos|null $tokenInfos, $bg_id = null)
     {
         $result = JxmEhrAccessHelper::api($error, 'rbac/role/own', $tokenInfos, [
             'page' => 1,
