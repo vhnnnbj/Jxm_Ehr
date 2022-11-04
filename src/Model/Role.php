@@ -41,5 +41,6 @@ class Role extends EhrBasicModel
      */
     const Type_Company_Admin = 80;
     const Type_Company_Normal = 85;
+    const Type_Branch_Company = 87; //分公司角色
     const Type_Department_Normal = 90;
 }

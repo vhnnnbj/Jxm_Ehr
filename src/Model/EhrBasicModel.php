@@ -19,4 +19,12 @@ class EhrBasicModel extends Model
         config()->set('database.connections.mysql_ehr', $conn);
         $this->connection = 'mysql_ehr';
     }
+
+    /**
+     * Notes: 为数组 / JSON 序列化准备日期。
+     */
+    protected function serializeDate(\DateTimeInterface $date)
+    {
+        return $date->format($this->dateFormat ?: 'Y-m-d H:i:s');
+    }
 }
