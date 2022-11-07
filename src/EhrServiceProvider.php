@@ -34,7 +34,7 @@ class EhrServiceProvider extends ServiceProvider
 
         Validator::extend('iam_user_exists', function ($attribute, $value,
                                                        $parameters, $validator) {
-            if (sizeof($parameters[0]) == 0) {
+            if (sizeof($parameters) == 0) {
                 $query = UserInfo::where('id', $value);
             } else {
                 $query = UserInfo::where($parameters[0], $value);
