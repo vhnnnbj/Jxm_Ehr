@@ -12,12 +12,20 @@ use Jxm\Ehr\JxmEhrAccessHelper;
 class EhrBasicModel extends Model
 {
     use SoftDeletes;
+
+    public static $ehr_conn = '';
+
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
-        $conn = JxmEhrAccessHelper::getConn();
-        config()->set('database.connections.mysql_ehr', $conn);
-        $this->connection = 'mysql_ehr';
+        if (!self::$ehr_conn) {
+            $conn = JxmEhrAccessHelper::getConn();
+            config()->set('database.connections.mysql_ehr', $conn);
+            $this->connection = 'mysql_ehr';
+            self::$ehr_conn = 'mysql_ehr';
+        } else {
+            $this->connection = self::$ehr_conn;
+        }
     }
 
     /**
