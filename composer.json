@@ -14,7 +14,6 @@
         "ext-json": "*",
         "guzzlehttp/guzzle": "6.*|7.*",
         "jxm/tool": "^0.1",
-        "vhnnnbj/lrt": "^0.1"
     },
     "autoload": {
         "psr-4": {
