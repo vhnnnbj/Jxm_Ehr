@@ -88,6 +88,7 @@ trait HasTreeRelations
                 ];
             }
         foreach ($allRelations as $relation) {
+            if (!$relation->category) continue;
             $matchRoles = Arr::where($roleInfos, function ($item) use ($relation) {
                 $pass = true;
                 if ($relation->role_id)
