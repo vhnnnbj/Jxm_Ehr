@@ -13,6 +13,7 @@ class AppEsbMiddleware
         $request->validate([
             'app_id' => 'required|string',
         ]);
+        $request->setTrustedProxies($request->getClientIps(), Request::HEADER_X_FORWARDED_FOR);
         $ip = $request->getClientIp();
         $result = JxmApi::esb($error, 'helper/app_auth', [
             'app_id' => $request['app_id'],
