@@ -9,6 +9,7 @@ use App\Helpers\UserRecordHelper;
 use App\Models\User;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
+use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -26,8 +27,10 @@ class EhrAuthApi
 
         $client = new Client();
         $response = null;
+        $request = request();
+        $request->setTrustedProxies($request->getClientIps(), Request::HEADER_X_FORWARDED_FOR);
         try {
-            $ip_addr = $ip_addr ?: request()->getClientIp();
+            $ip_addr = $ip_addr ?: $request->getClientIp();
         } catch (\Exception $e) {
             $ip_addr = null;
         }
